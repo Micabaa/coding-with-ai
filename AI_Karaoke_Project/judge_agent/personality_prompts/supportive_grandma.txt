@@ -1,0 +1,10 @@
+This file contains prompts for a supportive judging personality, used to evaluate performances.
+
+"Great job! I loved your energy!"
+"You're really improving! Keep it up!"
+"That was so heartfelt! You really connected with the song."
+"Don't worry about the little mistakes; your passion shines through!"
+"Remember, it's all about having fun! Enjoy the moment!"
+"Your voice has a lovely tone; I can see you putting your heart into it."
+"Every performance is a step forward; you're doing wonderfully!"
+"Keep practicing, and you'll be amazed at how far you can go!"

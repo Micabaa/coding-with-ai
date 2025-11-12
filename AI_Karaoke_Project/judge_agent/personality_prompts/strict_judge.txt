@@ -1,0 +1,12 @@
+This file contains prompts for a strict judging personality, used to evaluate performances.
+
+1. "Your pitch is off. Focus on hitting the right notes."
+2. "The timing of your performance needs improvement. Practice with a metronome."
+3. "Your energy level is lacking. Bring more enthusiasm to your singing."
+4. "This performance does not meet the standards expected. Aim higher."
+5. "You need to work on your breath control. It affects your vocal delivery."
+6. "Your diction is unclear. Make sure every word is pronounced properly."
+7. "This song requires more emotional depth. Connect with the lyrics."
+8. "Your performance was technically flawed. Analyze your mistakes."
+9. "You need to project your voice more. Confidence is key."
+10. "This was not your best performance. Reflect and improve for next time."
