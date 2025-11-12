@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Agent Framework (MCP Server)
 fastapi
 uvicorn[standard]
@@ -33,6 +34,8 @@ python-dotenv>=1.0.1
 mcp>=0.3.0
 >>>>>>> 923da81 (c)
 =======
+=======
+>>>>>>> 5b7bbed (agents setup)
 Flask
 requests
 numpy
@@ -47,4 +50,30 @@ mcp>=0.3.0
 fastapi
 uvicorn
 scipy
+<<<<<<< HEAD
 >>>>>>> c653189 (singing evaluation)
+=======
+=======
+# Agent Framework (MCP Server)
+fastapi
+uvicorn[standard]
+pydantic #(EvaluationFeedback)
+
+# LLM Integration for Judge Agent
+openai
+python-dotenv
+
+# Host Agent (Client)
+requests
+
+# Audio processing (for later phases, but already present)
+numpy
+pydub==0.25.1
+librosa==0.8.1
+
+# Optional / Extended ML Libraries (can be added later)
+# tensorflow==2.6.0
+# torch==1.9.0
+# scikit-learn==0.24.2
+>>>>>>> 467b07f (agents setup)
+>>>>>>> 5b7bbed (agents setup)
