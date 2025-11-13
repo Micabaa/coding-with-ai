@@ -1,0 +1,17 @@
+2025-11-12 12:02:33,827 | INFO | Judge Agent FastAPI Server started.
+2025-11-12 12:02:49,959 | INFO | Received evaluation for segment=seg_001 with personality=strict_judge, feedback_type=detail
+2025-11-12 12:02:53,338 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-12 12:02:53,350 | INFO | Feedback successfully generated: Your overall score of 0.77 is unacceptable. The most significant flaw lies in yo...
+2025-11-12 12:38:58,464 | INFO | Judge Agent FastAPI Server started.
+2025-11-12 12:40:19,512 | INFO | Received evaluation for segment=segment_44e7c1 with personality=strict_judge, feedback_type=detail
+2025-11-12 12:40:21,271 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-12 12:40:21,283 | INFO | Feedback successfully generated: Strong control, with good pitch accuracy but some rhythm inconsistencies. Tighte...
+2025-11-12 12:40:23,299 | INFO | Received evaluation for segment=segment_112a8a with personality=strict_judge, feedback_type=detail
+2025-11-12 12:40:24,733 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-12 12:40:24,741 | INFO | Feedback successfully generated: Pitch unstable; there were notable errors in pitch accuracy and rhythm precision...
+2025-11-12 12:40:26,756 | INFO | Received evaluation for segment=segment_d40626 with personality=strict_judge, feedback_type=detail
+2025-11-12 12:40:28,110 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-12 12:40:28,112 | INFO | Feedback successfully generated: Pitch unstable, with noticeable errors affecting overall quality. Support your v...
+2025-11-12 12:40:30,122 | INFO | Received evaluation for segment=None with personality=strict_judge, feedback_type=final
+2025-11-12 12:40:32,002 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-12 12:40:32,004 | INFO | Feedback successfully generated: Overall, the performance was mixed with a rating of 0.73, demonstrating potentia...

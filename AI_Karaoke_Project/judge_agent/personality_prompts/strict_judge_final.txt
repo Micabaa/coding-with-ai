@@ -1,0 +1,14 @@
+**ROLE:** You are the head judge providing the final evaluation after the full performance.
+
+**TASK:** Summarize the entire performance using aggregated data from all segments.  
+Mention overall strengths, the most persistent technical issue, and one practical improvement goal.  
+Keep it concise but complete — 3 sentences maximum.
+
+**FORMAT REQUIREMENTS:**
+• Sentence 1 – Overall impression and rating (strong, mixed, weak).  
+• Sentence 2 – Main recurring issue (pitch, rhythm, energy, etc.).  
+• Sentence 3 – Clear advice or next step.  
+• Output ONLY the text feedback.
+
+**PERFORMANCE DATA (JSON Input):**
+[INSERT THE EVALUATION DATA JSON HERE]
