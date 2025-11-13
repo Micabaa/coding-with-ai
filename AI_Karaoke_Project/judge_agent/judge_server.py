@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 from fastapi import FastAPI
 from pydantic import BaseModel
 import os
@@ -81,15 +82,21 @@ Provides structured evaluation feedback based on personality and performance dat
 Author: An My Behrendt & Mia Baudri
 """
 
+=======
+import os
+>>>>>>> 923da81 (c)
 import json
 import logging
 import traceback
 from pathlib import Path
-import google.generativeai as genai
-from mcp.server import Server
+from dotenv import load_dotenv
+from openai import OpenAI
+from fastapi import FastAPI
+from pydantic import BaseModel
 
-# === SETTINGS ===
-MODEL = "gemini-1.5-pro"
+# === ENVIRONMENT & CONFIG ===
+load_dotenv()  # loads variables from .env file
+MODEL = "gpt-4o-mini"
 PROMPTS_DIR = Path(__file__).parent / "personality_prompts"
 
 # === LOGGING CONFIGURATION ===
@@ -101,9 +108,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger("JudgeAgent")
 
-# === INITIALIZE OPENAI CLIENT AND MCP SERVER ===
-genai.configure(api_key="YOUR_GEMINI_KEY")  # or set via env var: GOOGLE_API_KEY
-server = Server("judge-agent")
+# === INITIALIZE CLIENT ===
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise RuntimeError("Missing OPENAI_API_KEY in .env file")
+
+client = OpenAI(api_key=api_key)
+server = FastAPI(title="Judge Agent API")
+
+# === Pydantic model for request ===
+class EvaluationRequest(BaseModel):
+    evaluation_data: dict
+    personality: str = "strict_judge"
 
 
 # === HELPER FUNCTIONS ===
@@ -121,18 +137,25 @@ def load_prompt(personality: str, feedback_type: str) -> str:
 
 
 def run_llm(prompt: str) -> str:
-    """Send the prompt to Gemini and return the response text."""
-    response = genai.GenerativeModel(MODEL).generate_content(prompt)
-    return response.text.strip()
+    """Send the prompt to OpenAI and return the feedback text."""
+    response = client.chat.completions.create(
+        model=MODEL,
+        messages=[
+            {"role": "system", "content": "You are the Karaoke Judge Agent."},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.8,
+    )
+    return response.choices[0].message.content.strip()
 
 
+# === ENDPOINT ===
+@server.post("/evaluate_performance")
+def evaluate_performance(request: EvaluationRequest):
+    """Receives evaluation data JSON and returns personality-based singing feedback."""
+    evaluation_data = request.evaluation_data
+    personality = request.personality
 
-# === MCP FUNCTION ===
-@server.function("evaluate_performance")
-def evaluate_performance(evaluation_data: dict, personality: str = "strict_judge"):
-    """
-    Receives evaluation data JSON and returns personality-based singing feedback.
-    """
     try:
         feedback_type = evaluation_data.get("feedback_type", "detail")
         logger.info(
@@ -149,20 +172,21 @@ def evaluate_performance(evaluation_data: dict, personality: str = "strict_judge
         feedback_text = run_llm(full_prompt)
         logger.info(f"Feedback successfully generated: {feedback_text[:80]}...")
 
-        return {"content": {"feedback": feedback_text}}
+        return {"feedback": feedback_text}
 
     except FileNotFoundError as e:
         logger.error(f"Missing prompt: {e}")
-        return {"content": {"error": f"Prompt not found: {str(e)}"}}
+        return {"error": f"Prompt not found: {str(e)}"}
 
     except Exception as e:
         logger.error(f"Unexpected error: {e}\n{traceback.format_exc()}")
-        return {"content": {"error": f"Unexpected error: {str(e)}"}}
+        return {"error": f"Unexpected error: {str(e)}"}
 
 
-
-# === ENTRY POINT ===
+# === RUN SERVER LOCALLY ===
+# Run with: uvicorn judge_server:server --reload
 if __name__ == "__main__":
+<<<<<<< HEAD
 <<<<<<< HEAD
     import uvicorn
     # 🚨 Wichtig: Startet den Server auf dem definierten Port
@@ -179,3 +203,10 @@ if __name__ == "__main__":
         logger.info("Server stopped manually.")
         print("\n Server stopped by user.")
 >>>>>>> 866fc75 (...)
+=======
+    import uvicorn
+
+    print("🎤 Starting Judge Agent FastAPI Server...")
+    logger.info("Judge Agent FastAPI Server started.")
+    uvicorn.run("judge_server:server", host="0.0.0.0", port=8000, reload=True)
+>>>>>>> 923da81 (c)
