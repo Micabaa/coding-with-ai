@@ -66,8 +66,23 @@ To run the project, start each agent's server in separate terminal instances:
    python host_agent/host_coordinator.py
    ```
 
-## Contributing
-Contributions are welcome! Please submit a pull request or open an issue for any enhancements or bug fixes.
+## Verification
+To verify the interaction between the Singing Evaluator and the Judge Agent, run the verification script:
+
+```bash
+python test_clients/verify_agents.py
+```
+
+This script generates a synthetic audio tone, sends it to the Singing Evaluator, and forwards the result to the Judge Agent.
+
+### Configuration
+To enable real AI feedback from the Judge Agent, create a `.env` file in the `judge_agent` directory with your OpenAI API key:
+
+```bash
+OPENAI_API_KEY=sk-your-api-key-here
+```
+
+If the key is missing, the Judge Agent will run in **Mock Mode** and return placeholder feedback.
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for more details.
