@@ -2,6 +2,7 @@
 fastapi
 uvicorn[standard]
 pydantic #(EvaluationFeedback)
+jinja2
 
 # LLM Integration for Judge Agent
 openai
@@ -14,6 +15,8 @@ requests
 numpy
 pydub==0.25.1
 librosa==0.8.1
+yt-dlp
+lyricsgenius
 
 # Optional / Extended ML Libraries (can be added later)
 # tensorflow==2.6.0

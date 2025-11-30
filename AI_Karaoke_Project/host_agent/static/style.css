@@ -1,0 +1,88 @@
+body {
+    background-color: #1a1a2e;
+    color: #e94560;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    text-align: center;
+    width: 80%;
+    max-width: 800px;
+}
+
+h1 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.controls {
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+input[type="text"] {
+    padding: 10px;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    border: none;
+    width: 60%;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.1s;
+}
+
+#play-btn {
+    background-color: #0f3460;
+    color: white;
+}
+
+#stop-btn {
+    background-color: #e94560;
+    color: white;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+.lyrics-container {
+    background-color: #16213e;
+    border-radius: 10px;
+    padding: 20px;
+    height: 400px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+#lyrics-content p {
+    font-size: 1.5rem;
+    line-height: 2;
+    color: #fff;
+    margin: 10px 0;
+}
+
+.placeholder {
+    color: #533483 !important;
+    font-style: italic;
+}
+
+#status-message {
+    margin-bottom: 1rem;
+    font-weight: bold;
+    color: #fff;
+}

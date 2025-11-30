@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Karaoke Host</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 AI Karaoke Host</h1>
+        
+        <div class="controls">
+            <input type="text" id="song-query" placeholder="Enter song name..." />
+            <button id="play-btn">Play</button>
+            <button id="stop-btn">Stop</button>
+        </div>
+
+        <div id="status-message"></div>
+
+        <div class="lyrics-container">
+            <div id="lyrics-content">
+                <!-- Lyrics will appear here -->
+                <p class="placeholder">Lyrics will appear here...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
