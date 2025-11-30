@@ -15,3 +15,28 @@
 2025-11-12 12:40:30,122 | INFO | Received evaluation for segment=None with personality=strict_judge, feedback_type=final
 2025-11-12 12:40:32,002 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2025-11-12 12:40:32,004 | INFO | Feedback successfully generated: Overall, the performance was mixed with a rating of 0.73, demonstrating potentia...
+2025-11-30 22:15:04,971 | WARNING | Missing OPENAI_API_KEY in .env file. Running in MOCK mode.
+2025-11-30 22:15:31,766 | INFO | Received evaluation for segment=test_segment_001 with personality=strict_judge, feedback_type=detail
+2025-11-30 22:15:31,767 | INFO | Feedback successfully generated: [MOCK FEEDBACK] The API key is missing, so here is a placeholder response. Your ...
+2025-11-30 22:17:35,136 | INFO | Received evaluation for segment=test_segment_001 with personality=strict_judge, feedback_type=detail
+2025-11-30 22:17:35,137 | INFO | Feedback successfully generated: [MOCK FEEDBACK] The API key is missing, so here is a placeholder response. Your ...
+2025-11-30 22:26:24,763 | INFO | Processing request of type CallToolRequest
+2025-11-30 22:26:24,763 | INFO | Received evaluation for segment=mcp_test_001 with personality=strict_judge, feedback_type=detail
+2025-11-30 22:26:26,694 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-30 22:26:26,704 | INFO | Feedback successfully generated: Strong control, but rhythm is completely off. Tighten your timing....
+2025-11-30 22:26:26,708 | INFO | Processing request of type ListToolsRequest
+2025-11-30 22:35:33,155 | INFO | Processing request of type CallToolRequest
+2025-11-30 22:35:33,155 | INFO | Received evaluation for segment=mcp_test_001 with personality=strict_judge, feedback_type=detail
+2025-11-30 22:35:37,740 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-30 22:35:37,751 | INFO | Feedback successfully generated: Strong control, but rhythm precision is lacking significantly. Tighten your timi...
+2025-11-30 22:35:37,755 | INFO | Processing request of type ListToolsRequest
+2025-11-30 22:53:39,818 | INFO | Processing request of type CallToolRequest
+2025-11-30 22:53:39,819 | INFO | Received evaluation for segment=mcp_test_001 with personality=strict_judge, feedback_type=detail
+2025-11-30 22:53:42,260 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-30 22:53:42,269 | INFO | Feedback successfully generated: Pitch unstable; while your vocal power is high, there is a lack of precision in ...
+2025-11-30 22:53:42,275 | INFO | Processing request of type ListToolsRequest
+2025-11-30 22:59:35,007 | INFO | Processing request of type CallToolRequest
+2025-11-30 22:59:35,007 | INFO | Received evaluation for segment=mcp_test_001 with personality=strict_judge, feedback_type=detail
+2025-11-30 22:59:37,903 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-30 22:59:37,916 | INFO | Feedback successfully generated: Pitch unstable; although you exhibit high vocal power, your rhythm precision lag...
+2025-11-30 22:59:37,920 | INFO | Processing request of type ListToolsRequest

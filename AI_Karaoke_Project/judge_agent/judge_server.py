@@ -91,11 +91,10 @@ import traceback
 from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
-from fastapi import FastAPI
-from pydantic import BaseModel
+from mcp.server.fastmcp import FastMCP
 
 # === ENVIRONMENT & CONFIG ===
-load_dotenv()  # loads variables from .env file
+load_dotenv()
 MODEL = "gpt-4o-mini"
 PROMPTS_DIR = Path(__file__).parent / "personality_prompts"
 
@@ -110,17 +109,15 @@ logger = logging.getLogger("JudgeAgent")
 
 # === INITIALIZE CLIENT ===
 api_key = os.getenv("OPENAI_API_KEY")
+client = None
 if not api_key:
-    raise RuntimeError("Missing OPENAI_API_KEY in .env file")
+    logger.warning("Missing OPENAI_API_KEY in .env file. Running in MOCK mode.")
+    print("⚠️  WARNING: OPENAI_API_KEY not found. Judge Agent running in MOCK mode.")
+else:
+    client = OpenAI(api_key=api_key)
 
-client = OpenAI(api_key=api_key)
-server = FastAPI(title="Judge Agent API")
-
-# === Pydantic model for request ===
-class EvaluationRequest(BaseModel):
-    evaluation_data: dict
-    personality: str = "strict_judge"
-
+# Initialize FastMCP Server
+mcp = FastMCP("Judge Agent")
 
 # === HELPER FUNCTIONS ===
 def load_prompt(personality: str, feedback_type: str) -> str:
@@ -130,32 +127,43 @@ def load_prompt(personality: str, feedback_type: str) -> str:
 >>>>>>> 866fc75 (...)
 
     if not prompt_path.exists():
-        raise FileNotFoundError(f"Prompt file not found: {prompt_path}")
+        # Fallback to strict_judge_detail if specific prompt missing
+        logger.warning(f"Prompt {prompt_file} not found, falling back to strict_judge_detail.txt")
+        return (PROMPTS_DIR / "strict_judge_detail.txt").read_text(encoding="utf-8")
 
     with open(prompt_path, "r", encoding="utf-8") as f:
         return f.read()
 
-
 def run_llm(prompt: str) -> str:
     """Send the prompt to OpenAI and return the feedback text."""
-    response = client.chat.completions.create(
-        model=MODEL,
-        messages=[
-            {"role": "system", "content": "You are the Karaoke Judge Agent."},
-            {"role": "user", "content": prompt},
-        ],
-        temperature=0.8,
-    )
-    return response.choices[0].message.content.strip()
+    if not client:
+        return "[MOCK FEEDBACK] The API key is missing, so here is a placeholder response. Your singing was... interesting! (Mock mode)"
+        
+    try:
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {"role": "system", "content": "You are the Karaoke Judge Agent."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.8,
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        logger.error(f"OpenAI API Error: {e}")
+        return f"Error generating feedback: {str(e)}"
 
+# === TOOLS ===
 
-# === ENDPOINT ===
-@server.post("/evaluate_performance")
-def evaluate_performance(request: EvaluationRequest):
-    """Receives evaluation data JSON and returns personality-based singing feedback."""
-    evaluation_data = request.evaluation_data
-    personality = request.personality
-
+@mcp.tool()
+def evaluate_performance(evaluation_data: dict, personality: str = "strict_judge") -> str:
+    """
+    Generates personality-based singing feedback based on evaluation data.
+    
+    Args:
+        evaluation_data: JSON object containing pitch, rhythm, and performance metrics.
+        personality: The personality of the judge (e.g., 'strict_judge', 'supportive_grandma').
+    """
     try:
         feedback_type = evaluation_data.get("feedback_type", "detail")
         logger.info(
@@ -172,20 +180,14 @@ def evaluate_performance(request: EvaluationRequest):
         feedback_text = run_llm(full_prompt)
         logger.info(f"Feedback successfully generated: {feedback_text[:80]}...")
 
-        return {"feedback": feedback_text}
-
-    except FileNotFoundError as e:
-        logger.error(f"Missing prompt: {e}")
-        return {"error": f"Prompt not found: {str(e)}"}
+        return feedback_text
 
     except Exception as e:
         logger.error(f"Unexpected error: {e}\n{traceback.format_exc()}")
-        return {"error": f"Unexpected error: {str(e)}"}
+        return f"Error: {str(e)}"
 
-
-# === RUN SERVER LOCALLY ===
-# Run with: uvicorn judge_server:server --reload
 if __name__ == "__main__":
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     import uvicorn
@@ -210,3 +212,9 @@ if __name__ == "__main__":
     logger.info("Judge Agent FastAPI Server started.")
     uvicorn.run("judge_server:server", host="0.0.0.0", port=8000, reload=True)
 >>>>>>> 923da81 (c)
+=======
+    print("🎤 Starting Judge Agent MCP Server...")
+    # FastMCP runs on stdio by default when called directly
+    mcp.run()
+
+>>>>>>> c653189 (singing evaluation)
