@@ -40,3 +40,14 @@
 2025-11-30 22:59:37,903 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2025-11-30 22:59:37,916 | INFO | Feedback successfully generated: Pitch unstable; although you exhibit high vocal power, your rhythm precision lag...
 2025-11-30 22:59:37,920 | INFO | Processing request of type ListToolsRequest
+2025-12-01 13:03:01,539 | INFO | Processing request of type CallToolRequest
+2025-12-01 13:03:01,539 | INFO | Received evaluation for segment=mcp_test_001 with personality=strict_judge, feedback_type=detail
+2025-12-01 13:03:03,097 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-01 13:03:03,104 | INFO | Feedback successfully generated: Pitch unstable with significant rhythm issues. Tighten your timing....
+2025-12-01 13:03:03,109 | INFO | Processing request of type ListToolsRequest
+2025-12-01 13:27:17,860 | INFO | Processing request of type CallToolRequest
+2025-12-01 13:27:17,860 | INFO | Received evaluation for segment=session_001 with personality=simon_cowell, feedback_type=detail
+2025-12-01 13:27:17,860 | WARNING | Prompt simon_cowell_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-01 13:27:19,084 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-01 13:27:19,090 | INFO | Feedback successfully generated: Strong control, with excellent pitch accuracy but lacking in vocal power. Suppor...
+2025-12-01 13:27:19,093 | INFO | Processing request of type ListToolsRequest
