@@ -1,19 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Karaoke Host</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
     <div class="container">
         <h1>🎤 AI Karaoke Host</h1>
-        
+
         <div class="controls">
             <input type="text" id="song-query" placeholder="Enter song name..." />
             <button id="play-btn">Play</button>
             <button id="stop-btn">Stop</button>
+        </div>
+
+        <div class="sync-controls" style="display: none;">
+            <button id="offset-minus" class="secondary-btn">Reward (-0.5s)</button>
+            <span id="offset-display">Offset: 0.0s</span>
+            <button id="offset-plus" class="secondary-btn">Forward (+0.5s)</button>
+        </div>
+
+        <div class="player-wrapper">
+            <audio id="audio-player" controls style="width: 100%; margin: 15px 0; display: none;"></audio>
         </div>
 
         <div id="status-message"></div>
@@ -28,4 +40,5 @@
 
     <script src="/static/script.js"></script>
 </body>
+
 </html>

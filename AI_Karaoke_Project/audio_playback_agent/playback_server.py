@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import subprocess
 import os
-import signal
 import logging
 import yt_dlp
 import glob
@@ -13,13 +13,26 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Audio Playback Agent")
 
-# Global variable to keep track of the playback process
-current_process = None
-SONGS_DIR = "songs"
+# Allow CORS so the host (on a different port) or browser can fetch/play
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Ensure songs directory exists
+# Robust directory handling
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Assume songs are in a directory relative to this agent or project root
+# Using a local 'songs' directory in this agent's folder for simplicity and safety
+SONGS_DIR = os.path.join(BASE_DIR, "songs")
+
 if not os.path.exists(SONGS_DIR):
     os.makedirs(SONGS_DIR)
+
+# Mount the songs directory to serve files statically
+app.mount("/songs", StaticFiles(directory=SONGS_DIR), name="songs")
 
 class PlayRequest(BaseModel):
     track_path: str
@@ -30,7 +43,7 @@ class SearchRequest(BaseModel):
 def download_audio(query: str):
     """
     Searches for a video on YouTube and downloads the audio.
-    Returns the path to the downloaded file.
+    Returns the filename (relative to SONGS_DIR).
     """
     ydl_opts = {
         'format': 'bestaudio/best',
@@ -42,7 +55,7 @@ def download_audio(query: str):
         }],
         'noplaylist': True,
         'quiet': True,
-        'default_search': 'ytsearch1:', # Search and download the first result
+        'default_search': 'ytsearch1:', 
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -51,60 +64,50 @@ def download_audio(query: str):
         if 'entries' in info:
             info = info['entries'][0]
         
-        # Find the downloaded file
-        # yt-dlp might sanitize the filename, so we look for the most recently modified file in the dir
-        # or try to predict the filename. 
-        # A simpler way for this MVP: return the filename from info dict
         filename = ydl.prepare_filename(info)
-        # The actual file will have the extension replaced by mp3
         base, _ = os.path.splitext(filename)
-        final_path = f"{base}.mp3"
+        # yt-dlp with mp3 conversion results in .mp3
+        final_abs_path = f"{base}.mp3"
         
-        return final_path, info.get('title', 'Unknown Title')
+        # We need the relative path or filename to serve it
+        final_filename = os.path.basename(final_abs_path)
+        
+        return final_filename, info.get('title', 'Unknown Title')
 
 @app.post("/play")
 def play_audio(request: PlayRequest):
-    global current_process
+    """
+    Returns the URL for the audio file.
+    Expects 'track_path' to be the filename or relative path.
+    """
+    # Assuming track_path is just the filename now
+    filename = os.path.basename(request.track_path)
     
-    track_path = request.track_path
-    
-    if not os.path.exists(track_path):
-        raise HTTPException(status_code=404, detail=f"Track not found at {track_path}")
+    file_path = os.path.join(SONGS_DIR, filename)
+    if not os.path.exists(file_path):
+         raise HTTPException(status_code=404, detail=f"Track not found: {filename}")
 
-    # Stop any currently playing audio
-    if current_process and current_process.poll() is None:
-        stop_audio()
-
-    try:
-        # Use afplay on macOS for audio playback
-        logger.info(f"Starting playback for: {track_path}")
-        current_process = subprocess.Popen(['afplay', track_path])
-        return {"status": "playing", "track": track_path}
-    except Exception as e:
-        logger.error(f"Failed to play audio: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    # Return the full URL to the file
+    # Assuming localhost:8001
+    return {
+        "status": "playing", 
+        "track": filename,
+        "url": f"http://localhost:8001/songs/{filename}"
+    }
 
 @app.post("/search_and_play")
 def search_and_play(request: SearchRequest):
-    """
-    Searches YouTube for the query (appends 'karaoke' automatically),
-    downloads the audio, and plays it.
-    """
     query = f"{request.query} karaoke"
     try:
-        file_path, title = download_audio(query)
+        filename, title = download_audio(query)
         
         # Verify file exists
+        file_path = os.path.join(SONGS_DIR, filename)
         if not os.path.exists(file_path):
-             # Fallback: sometimes extension handling is tricky, look for any file with that name
-             # or just list dir and pick latest? 
-             # Let's try to be robust:
-             logger.warning(f"Expected file {file_path} not found. Checking directory...")
-             # This part can be improved, but let's assume yt-dlp did its job.
+             logger.warning(f"Expected file {file_path} not found.")
              raise HTTPException(status_code=500, detail="Downloaded file not found")
 
-        # Play it
-        return play_audio(PlayRequest(track_path=file_path))
+        return play_audio(PlayRequest(track_path=filename))
         
     except Exception as e:
         logger.error(f"Search and play failed: {e}")
@@ -112,24 +115,8 @@ def search_and_play(request: SearchRequest):
 
 @app.post("/stop")
 def stop_audio():
-    global current_process
-    if current_process and current_process.poll() is None:
-        logger.info("Stopping playback...")
-        current_process.terminate()
-        try:
-            current_process.wait(timeout=2)
-        except subprocess.TimeoutExpired:
-            current_process.kill()
-        current_process = None
-        return {"status": "stopped"}
-    return {"status": "no audio playing"}
-
-@app.get("/status")
-def get_status():
-    global current_process
-    if current_process and current_process.poll() is None:
-        return {"status": "playing"}
-    return {"status": "stopped"}
+    # Helper for compatibility, but the frontend controls playback now.
+    return {"status": "stopped (client-side control)"}
 
 if __name__ == "__main__":
     import uvicorn
