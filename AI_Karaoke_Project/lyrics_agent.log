@@ -1,0 +1,20 @@
+INFO:     Started server process [80790]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:__main__:Searching syncedlyrics for: killing me by jorja smith
+INFO:syncedlyrics:Lyrics found for "killing me by jorja smith" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:60894 - "GET /search_lyrics?query=killing+me+by+jorja+smith HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: dot by girl in red
+INFO:syncedlyrics:Found plaintext lyrics on Genius, but continuing search for synced lyrics
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:60998 - "GET /search_lyrics?query=dot+by+girl+in+red HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: . by girl in red
+INFO:syncedlyrics:Lyrics found for ". by girl in red" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:61039 - "GET /search_lyrics?query=.+by+girl+in+red HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: wildflower billie eilish
+INFO:syncedlyrics:Lyrics found for "wildflower billie eilish" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:61091 - "GET /search_lyrics?query=wildflower+billie+eilish HTTP/1.1" 200 OK

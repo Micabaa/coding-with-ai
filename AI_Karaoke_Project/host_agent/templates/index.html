@@ -14,6 +14,12 @@
 
         <div class="controls">
             <input type="text" id="song-query" placeholder="Enter song name..." />
+            <select id="personality-select" style="padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+                <option value="strict_judge">Strict Judge</option>
+                <option value="supportive_grandma">Supportive Grandma</option>
+                <option value="lazy_critic">Lazy Critic</option>
+                <option value="overly_enthusiastic">Overly Enthusiastic</option>
+            </select>
             <button id="play-btn">Play</button>
             <button id="stop-btn">Stop</button>
         </div>
@@ -45,18 +51,7 @@
         </div>
     </div>
 
-    <div class="recording-controls"
-        style="margin-top: 20px; text-align: center; border-top: 1px solid #ccc; padding-top: 20px;">
-        <h3>🎤 Performance Mode</h3>
-        <select id="personality-select" style="padding: 8px; margin-bottom: 10px;">
-            <option value="strict_judge">Strict Judge</option>
-            <option value="supportive_grandma">Supportive Grandma</option>
-            <option value="lazy_critic">Lazy Critic</option>
-            <option value="overly_enthusiastic">Overly Enthusiastic</option>
-        </select>
-        <br>
-        <button id="record-btn" class="primary-btn" style="background-color: #e74c3c;">🎤 Start Recording</button>
-    </div>
+
 
     <div id="judge-section" class="judge-container"
         style="display: none; margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 8px;">

@@ -1,23 +1,10 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 import os
 import logging
 import yt_dlp
-import glob
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-import logging
-import yt_dlp
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -48,49 +35,65 @@ class SearchRequest(BaseModel):
 def download_video(query: str):
     """
     Searches for a video and downloads it as MP4.
-    Returns filename and title.
+    Returns filename (basename) and title.
     """
     ydl_opts = {
-        'format': 'best[ext=mp4]/best', # Prefer mp4
-        'outtmpl': f'{SONGS_DIR}/%(title)s.%(ext)s',
+        'format': 'best[ext=mp4]',
         'noplaylist': True,
         'quiet': True,
-        'default_search': 'ytsearch1:',
+        'default_search': 'ytsearch5:', # Search 5 candidates
+        # 'paths': ... (handled by output template)
+        'outtmpl': os.path.join(SONGS_DIR, '%(id)s.%(ext)s'),
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        logger.info(f"Searching and downloading video: {query}")
-        info = ydl.extract_info(query, download=True)
-        
-        if 'entries' in info:
-            info = info['entries'][0]
-        
-        filename = ydl.prepare_filename(info)
-        # Ensure we return just the filename
-        final_filename = os.path.basename(filename)
-        return final_filename, info.get('title', 'Unknown Title')
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            logger.info(f"Searching for: {query}")
+            info = ydl.extract_info(query, download=False)
+            
+            video_info = None
+            if 'entries' in info:
+                # Filter for videos > 60s to avoid Shorts/Teasers
+                for entry in info['entries']:
+                    duration = entry.get('duration', 0)
+                    if duration > 60:
+                        video_info = entry
+                        break
+                
+                # Fallback to first if no long video found
+                if not video_info and info['entries']:
+                    video_info = info['entries'][0]
+            else:
+                video_info = info
 
-@app.post("/play")
-def play_audio(request: PlayRequest):
-    """
-    Returns the URL for the audio file.
-    Expects 'track_path' to be the filename or relative path.
-    """
-    # Assuming track_path is just the filename now
-    filename = os.path.basename(request.track_path)
-    
-    file_path = os.path.join(SONGS_DIR, filename)
-    if not os.path.exists(file_path):
-         raise HTTPException(status_code=404, detail=f"Track not found: {filename}")
+            if not video_info:
+                 raise HTTPException(404, "No video found")
 
-    # Return the full URL to the file
-    # Assuming localhost:8001
-    return {
-        "status": "playing", 
-        "track": filename,
-        "url": f"http://localhost:8001/songs/{filename}",
-        "file_path": file_path # Absolute path for internal use
-    }
+            video_id = video_info['id']
+            title = video_info['title']
+            file_path = os.path.join(SONGS_DIR, f"{video_id}.mp4")
+
+            # Download if not exists
+            if not os.path.exists(file_path):
+                logger.info(f"Downloading video: {title}")
+                # We need to re-run with THIS specific video ID to download
+                # Or just let ydl download it now? 
+                # Better to configure ydl to download THE filtered video.
+                # Re-run ydl for the specific ID
+                ydl_opts['default_search'] = 'ytsearch1:' # Reset
+                # Actually, simply running process logic:
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl_download:
+                    ydl_download.download([video_info['webpage_url']])
+            
+            return {
+                "url": f"/songs/{video_id}.mp4",
+                "title": title,
+                "track": title,
+                "file_path": os.path.abspath(file_path)
+            }
+    except Exception as e:
+        logger.error(f"Error in download_video: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/search_and_play")
 def search_and_play(request: SearchRequest):
@@ -100,23 +103,27 @@ def search_and_play(request: SearchRequest):
     """
     query = f"{request.query} karaoke"
     try:
-        filename, title = download_video(query)
+        video_data = download_video(query)
         
         # Verify file exists
-        file_path = os.path.join(SONGS_DIR, filename)
+        file_path = video_data['file_path']
         if not os.path.exists(file_path):
-             # Try checking if yt-dlp changed extension (e.g. mkv/webm)
-             # But prepare_filename usually is correct.
              logger.warning(f"Expected file {file_path} not found.")
-             # Fallback check dir for similar name? skipping for now
              raise HTTPException(status_code=500, detail="Downloaded file not found")
 
+        title = video_data['title']
         is_sing_king = "sing king" in title.lower()
+        
+        # Construct URL (assuming default port 8001)
+        # Note: If running on a different port/host, this needs to be dynamic or configured.
+        filename = os.path.basename(file_path)
+        url = f"http://localhost:8001/songs/{filename}"
 
         return {
             "status": "success", 
             "track": title,
-            "url": f"http://localhost:8001/songs/{filename}", # Local URL
+            "url": url,
+            "file_path": file_path, # Absolute path for evaluator
             "is_sing_king": is_sing_king
         }
         
@@ -127,10 +134,6 @@ def search_and_play(request: SearchRequest):
 @app.post("/stop")
 def stop_audio():
     return {"status": "stopped"}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
 
 if __name__ == "__main__":
     import uvicorn

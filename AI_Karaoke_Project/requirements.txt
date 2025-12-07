@@ -15,3 +15,4 @@ syncedlyrics
 mcp>=0.3.0
 scipy
 fastdtw
+soundfile

@@ -3,13 +3,34 @@ let lyricOffset = 0.0;
 const videoPlayer = document.getElementById('video-player');
 const lyricsDiv = document.getElementById('lyrics-content');
 const statusDiv = document.getElementById('status-message');
+const judgeSection = document.getElementById('judge-section');
+const feedbackDiv = document.getElementById('judge-feedback');
+const scoreDiv = document.getElementById('score-display');
 
+
+// Global stream to hold permission
+let audioStream = null;
 
 document.getElementById('play-btn').addEventListener('click', async () => {
     const query = document.getElementById('song-query').value;
 
     if (!query) {
         alert("Please enter a song name!");
+        return;
+    }
+
+    // 1. Get Microphone Permission IMMEDIATELY (User Gesture)
+    try {
+        audioStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            }
+        });
+    } catch (err) {
+        console.error("Mic access failed:", err);
+        alert("Microphone access is required for karaoke scoring! Please allow it.");
         return;
     }
 
@@ -24,6 +45,11 @@ document.getElementById('play-btn').addEventListener('click', async () => {
 
     // Reset offset
     updateOffsetDisplay(0.0);
+
+    // Clear previous results
+    document.getElementById('judge-section').style.display = 'none';
+    document.getElementById('judge-feedback').textContent = "";
+    document.getElementById('score-display').textContent = "";
 
     try {
         const response = await fetch('/api/play_song', {
@@ -40,13 +66,23 @@ document.getElementById('play-btn').addEventListener('click', async () => {
 
         const data = await response.json();
 
-        statusDiv.textContent = `Playing: ${data.audio.track}`;
+        const duration = videoPlayer.duration;
+        statusDiv.textContent = `Playing: ${data.audio.track} [${duration ? duration.toFixed(0) + 's' : 'Unknown'}] (Recording Started 🔴)`;
+
+        // Update duration if it loads later
+        videoPlayer.addEventListener('loadedmetadata', () => {
+            statusDiv.textContent = `Playing: ${data.audio.track} [${videoPlayer.duration.toFixed(0)}s] (Recording Started 🔴)`;
+        });
 
         // Handle Video
         if (data.audio.url) {
             videoPlayer.src = data.audio.url;
             videoPlayer.style.display = 'block';
             document.querySelector('.sync-controls').style.display = 'flex';
+
+            // Do NOT start recording immediately.
+            // Wait for 'playing' event to sync with video start.
+
             videoPlayer.play().catch(e => console.log("Auto-play prevented:", e));
 
             // Auto-Offset Removed - User will sync manually
@@ -68,16 +104,32 @@ document.getElementById('play-btn').addEventListener('click', async () => {
     }
 });
 
+// Event listener for precise sync
+videoPlayer.addEventListener('playing', () => {
+    if (audioStream && !isRecording) {
+        console.log("Video started playing - Starting Recording...");
+        startRecording(audioStream);
+    }
+});
+
 document.getElementById('stop-btn').addEventListener('click', async () => {
+    // 1. Stop Video
     videoPlayer.pause();
-    videoPlayer.currentTime = 0;
-    statusDiv.textContent = "Stopped.";
+
+    // 2. Stop Recording & Submit
+    if (isRecording) {
+        stopRecordingAndJudge();
+    } else {
+        statusDiv.textContent = "Stopped (No recording was active).";
+    }
+
     try {
         await fetch('/api/stop_song', { method: 'POST' });
     } catch (error) {
         console.error(error);
     }
 });
+
 
 function renderLyrics(lyrics) {
     lyricsDiv.innerHTML = '';
@@ -137,10 +189,6 @@ function highlightLine(index) {
     const current = document.getElementById(`line-${index}`);
     if (current) {
         current.classList.add('highlight');
-        current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-        });
     }
 
     lastHighlightedIndex = index;
@@ -166,63 +214,54 @@ videoPlayer.addEventListener('timeupdate', () => {
         highlightLine(activeIndex);
     }
 });
-// ... (Previous code remains)
+
 
 // === RECORDING LOGIC ===
 let mediaRecorder;
 let audioChunks = [];
 let isRecording = false;
 
-const recordBtn = document.getElementById('record-btn');
-const judgeSection = document.getElementById('judge-section');
-const feedbackDiv = document.getElementById('judge-feedback');
-const scoreDiv = document.getElementById('score-display');
+// Remove/Ignore manual record button listeners if they exist
+// We rely on auto-start
 
-if (recordBtn) {
-    recordBtn.addEventListener('click', async () => {
-        if (!isRecording) {
-            startRecording();
-        } else {
-            stopRecordingAndJudge();
-        }
-    });
-}
+function startRecording(stream) {
+    if (!stream) {
+        console.error("No stream provided to startRecording");
+        return;
+    }
 
-async function startRecording() {
     try {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            throw new Error("Browser API 'navigator.mediaDevices.getUserMedia' is not available. This usually happens if you are not using HTTPS or localhost. Please ensure you are accessing the app via http://localhost:8000.");
-        }
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
         audioChunks = [];
 
         mediaRecorder.ondataavailable = event => {
-            audioChunks.push(event.data);
+            if (event.data && event.data.size > 0) {
+                audioChunks.push(event.data);
+                // console.log(`Got audio chunk: ${event.data.size} bytes`);
+            }
         };
 
-        mediaRecorder.start();
-        isRecording = true;
-        recordBtn.textContent = "⏹ Stop & Judge";
-        recordBtn.classList.add("recording");
-        statusDiv.textContent = "🎤 Recording... Sing your heart out!";
+        mediaRecorder.onerror = (e) => {
+            console.error('MediaRecorder Error:', e);
+            statusDiv.textContent = `Recording Error: ${e.error.name}`;
+            alert("Recording failed! See console.");
+        };
 
-        // Clear previous results
-        judgeSection.style.display = 'none';
-        feedbackDiv.textContent = "";
-        scoreDiv.textContent = "";
+        // Check track status
+        stream.getAudioTracks().forEach(track => {
+            track.onended = () => {
+                console.warn("Microphone track ended unexpectedly!");
+                statusDiv.textContent += " (Mic disconnected)";
+            };
+        });
+
+        // Use 1000ms timeslice to ensure data is flushed regularly
+        mediaRecorder.start(1000);
+        isRecording = true;
+        console.log("MediaRecorder started (1s timeslice)");
 
     } catch (err) {
-        console.error("Error accessing microphone:", err);
-        let msg = "Could not access microphone.";
-        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-            msg += " Permission denied. Please allow microphone access in your browser settings.";
-        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-            msg += " No microphone found.";
-        } else {
-            msg += " Error: " + err.message;
-        }
-        alert(msg);
+        console.error("MediaRecorder error:", err);
     }
 }
 
@@ -231,8 +270,8 @@ async function stopRecordingAndJudge() {
 
     mediaRecorder.stop();
     isRecording = false;
-    recordBtn.textContent = "🎤 Start Recording";
-    recordBtn.classList.remove("recording");
+    isRecording = false;
+    // recordBtn lines removed since button is deleted
     statusDiv.textContent = "Processing performance...";
 
     mediaRecorder.onstop = async () => {
@@ -251,7 +290,16 @@ async function submitPerformance(audioBlob) {
 
     // Send current lyrics for timing analysis
     if (currentLyrics && currentLyrics.length > 0) {
-        formData.append("reference_lyrics", JSON.stringify(currentLyrics));
+        // IMPORTANT: Adjust timestamps by the user's offset!
+        // User sees lyric at T_vid = Timestamp - Offset.
+        // User sings at T_vid.
+        // Evaluator expects lyric at T_vid.
+        // So NewTimestamp = Timestamp - Offset.
+        const adjustedLyrics = currentLyrics.map(line => ({
+            ...line,
+            timestamp: line.timestamp - lyricOffset
+        }));
+        formData.append("reference_lyrics", JSON.stringify(adjustedLyrics));
     }
 
     try {
@@ -284,6 +332,7 @@ function displayResults(data) {
         <p><strong>Rhythm:</strong> ${(scores.rhythm_score * 100).toFixed(0)}%</p>
         <p><strong>Lyrics:</strong> ${(scores.lyrics_score * 100).toFixed(0)}%</p>
         <p><strong>Vocal Power:</strong> ${scores.vocal_power}</p>
+        <p style="font-size: 0.8em; color: gray;">Debug: Recorded ${scores.audio_duration ? scores.audio_duration.toFixed(1) : '?'}s</p>
     `;
 
     // Display Judge Feedback
