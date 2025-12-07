@@ -7,10 +7,11 @@ python-dotenv>=1.0.1
 requests
 numpy
 pydub==0.25.1
-librosa==0.8.1
+librosa>=0.10.0
 yt-dlp
 lyricsgenius
 syncedlyrics
 # scikit-learn==0.24.2
 mcp>=0.3.0
 scipy
+fastdtw

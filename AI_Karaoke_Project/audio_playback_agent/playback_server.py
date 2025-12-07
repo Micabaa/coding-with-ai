@@ -70,6 +70,28 @@ def download_video(query: str):
         final_filename = os.path.basename(filename)
         return final_filename, info.get('title', 'Unknown Title')
 
+@app.post("/play")
+def play_audio(request: PlayRequest):
+    """
+    Returns the URL for the audio file.
+    Expects 'track_path' to be the filename or relative path.
+    """
+    # Assuming track_path is just the filename now
+    filename = os.path.basename(request.track_path)
+    
+    file_path = os.path.join(SONGS_DIR, filename)
+    if not os.path.exists(file_path):
+         raise HTTPException(status_code=404, detail=f"Track not found: {filename}")
+
+    # Return the full URL to the file
+    # Assuming localhost:8001
+    return {
+        "status": "playing", 
+        "track": filename,
+        "url": f"http://localhost:8001/songs/{filename}",
+        "file_path": file_path # Absolute path for internal use
+    }
+
 @app.post("/search_and_play")
 def search_and_play(request: SearchRequest):
     """

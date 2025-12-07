@@ -45,6 +45,54 @@
         </div>
     </div>
 
+    <div class="recording-controls"
+        style="margin-top: 20px; text-align: center; border-top: 1px solid #ccc; padding-top: 20px;">
+        <h3>🎤 Performance Mode</h3>
+        <select id="personality-select" style="padding: 8px; margin-bottom: 10px;">
+            <option value="strict_judge">Strict Judge</option>
+            <option value="supportive_grandma">Supportive Grandma</option>
+            <option value="lazy_critic">Lazy Critic</option>
+            <option value="overly_enthusiastic">Overly Enthusiastic</option>
+        </select>
+        <br>
+        <button id="record-btn" class="primary-btn" style="background-color: #e74c3c;">🎤 Start Recording</button>
+    </div>
+
+    <div id="judge-section" class="judge-container"
+        style="display: none; margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 8px;">
+        <h2>👩‍⚖️ Judge's Verdict</h2>
+        <div id="score-display" class="score-grid">
+            <!-- Scores will be injected here -->
+        </div>
+        <div id="judge-feedback" class="feedback-box">
+            <!-- AI Feedback will be injected here -->
+        </div>
+
+        <!-- NEW: Detailed Summary -->
+        <div id="summary-section" class="summary-container">
+            <h3>📊 Performance Analysis</h3>
+
+            <div class="analysis-block">
+                <h4>Pitch Breakdown</h4>
+                <div id="pitch-bar" class="pitch-bar">
+                    <!-- Visual bar for High/Low/Perfect -->
+                </div>
+                <div id="pitch-legend" class="pitch-legend">
+                    <span class="legend-item"><span class="dot low"></span>Too Low</span>
+                    <span class="legend-item"><span class="dot perfect"></span>Perfect</span>
+                    <span class="legend-item"><span class="dot high"></span>Too High</span>
+                </div>
+            </div>
+
+            <div class="analysis-block">
+                <h4>Lyrics Check</h4>
+                <div id="lyrics-diff" class="lyrics-diff">
+                    <!-- Lyrics with diff highlighting -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/script.js"></script>
 </body>
 

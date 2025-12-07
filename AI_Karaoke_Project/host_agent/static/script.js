@@ -166,3 +166,159 @@ videoPlayer.addEventListener('timeupdate', () => {
         highlightLine(activeIndex);
     }
 });
+// ... (Previous code remains)
+
+// === RECORDING LOGIC ===
+let mediaRecorder;
+let audioChunks = [];
+let isRecording = false;
+
+const recordBtn = document.getElementById('record-btn');
+const judgeSection = document.getElementById('judge-section');
+const feedbackDiv = document.getElementById('judge-feedback');
+const scoreDiv = document.getElementById('score-display');
+
+if (recordBtn) {
+    recordBtn.addEventListener('click', async () => {
+        if (!isRecording) {
+            startRecording();
+        } else {
+            stopRecordingAndJudge();
+        }
+    });
+}
+
+async function startRecording() {
+    try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error("Browser API 'navigator.mediaDevices.getUserMedia' is not available. This usually happens if you are not using HTTPS or localhost. Please ensure you are accessing the app via http://localhost:8000.");
+        }
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        recordBtn.textContent = "⏹ Stop & Judge";
+        recordBtn.classList.add("recording");
+        statusDiv.textContent = "🎤 Recording... Sing your heart out!";
+
+        // Clear previous results
+        judgeSection.style.display = 'none';
+        feedbackDiv.textContent = "";
+        scoreDiv.textContent = "";
+
+    } catch (err) {
+        console.error("Error accessing microphone:", err);
+        let msg = "Could not access microphone.";
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            msg += " Permission denied. Please allow microphone access in your browser settings.";
+        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+            msg += " No microphone found.";
+        } else {
+            msg += " Error: " + err.message;
+        }
+        alert(msg);
+    }
+}
+
+async function stopRecordingAndJudge() {
+    if (!mediaRecorder) return;
+
+    mediaRecorder.stop();
+    isRecording = false;
+    recordBtn.textContent = "🎤 Start Recording";
+    recordBtn.classList.remove("recording");
+    statusDiv.textContent = "Processing performance...";
+
+    mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        await submitPerformance(audioBlob);
+    };
+}
+
+async function submitPerformance(audioBlob) {
+    const formData = new FormData();
+    formData.append("audio_file", audioBlob, "performance.wav");
+
+    // Get selected personality (assuming a dropdown exists, or default)
+    const personality = document.getElementById('personality-select')?.value || "strict_judge";
+    formData.append("personality", personality);
+
+    // Send current lyrics for timing analysis
+    if (currentLyrics && currentLyrics.length > 0) {
+        formData.append("reference_lyrics", JSON.stringify(currentLyrics));
+    }
+
+    try {
+        const response = await fetch('/api/submit_performance', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        displayResults(data);
+
+    } catch (error) {
+        statusDiv.textContent = "Error getting feedback: " + error.message;
+        console.error(error);
+    }
+}
+
+function displayResults(data) {
+    statusDiv.textContent = "Feedback Received!";
+    judgeSection.style.display = 'block';
+
+    // Display Scores
+    const scores = data.evaluation;
+    scoreDiv.innerHTML = `
+        <p><strong>Pitch Accuracy:</strong> ${(scores.pitch_accuracy_score * 100).toFixed(0)}%</p>
+        <p><strong>Rhythm:</strong> ${(scores.rhythm_score * 100).toFixed(0)}%</p>
+        <p><strong>Lyrics:</strong> ${(scores.lyrics_score * 100).toFixed(0)}%</p>
+        <p><strong>Vocal Power:</strong> ${scores.vocal_power}</p>
+    `;
+
+    // Display Judge Feedback
+    feedbackDiv.innerHTML = `<em>"${data.feedback}"</em>`;
+
+    // Display Pitch Detail
+    if (scores.pitch_detail) {
+        const p = scores.pitch_detail;
+        const bar = document.getElementById('pitch-bar');
+        // Simple flex bar
+        bar.innerHTML = `
+            <div style="width: ${p.low * 100}%; background-color: #ff4d4d;" title="Too Low: ${(p.low * 100).toFixed(0)}%"></div>
+            <div style="width: ${p.perfect * 100}%; background-color: #4caf50;" title="Perfect: ${(p.perfect * 100).toFixed(0)}%"></div>
+            <div style="width: ${p.high * 100}%; background-color: #ff9800;" title="Too High: ${(p.high * 100).toFixed(0)}%"></div>
+        `;
+    }
+
+    // Display Lyrics Diff
+    if (scores.lyrics_diff) {
+        const diffDiv = document.getElementById('lyrics-diff');
+        diffDiv.innerHTML = scores.lyrics_diff.map(item => {
+            if (item.status === 'matched') return `<span class="word-matched">${item.word} </span>`;
+            if (item.status === 'missing') return `<span class="word-missing">${item.word} </span>`;
+            if (item.status === 'wrong') {
+                let html = `<span class="word-wrong">${item.word}</span>`;
+                if (item.heard) {
+                    html += ` <span class="word-heard">(${item.heard})</span>`;
+                }
+                return html + ' ';
+            }
+            if (item.status === 'extra') return `<span class="word-extra">+${item.word} </span>`;
+            return '';
+        }).join('');
+    }
+
+    // Scroll to feedback
+    judgeSection.scrollIntoView({ behavior: 'smooth' });
+}
