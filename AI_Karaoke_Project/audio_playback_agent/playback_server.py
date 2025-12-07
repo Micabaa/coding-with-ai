@@ -92,7 +92,8 @@ def play_audio(request: PlayRequest):
     return {
         "status": "playing", 
         "track": filename,
-        "url": f"http://localhost:8001/songs/{filename}"
+        "url": f"http://localhost:8001/songs/{filename}",
+        "file_path": file_path # Absolute path for internal use
     }
 
 @app.post("/search_and_play")

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
@@ -25,8 +25,11 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # Agent URLs (Localhost for now)
+# Agent URLs (Localhost for now)
 AUDIO_AGENT_URL = "http://localhost:8001"
 LYRICS_AGENT_URL = "http://localhost:8002"
+EVALUATOR_AGENT_URL = "http://localhost:8003"
+JUDGE_AGENT_URL = "http://localhost:8004"
 
 class SongRequest(BaseModel):
     query: str
@@ -34,6 +37,9 @@ class SongRequest(BaseModel):
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+# Global state to track current song
+current_song_metadata = {}
 
 @app.post("/api/play_song")
 async def play_song(request: SongRequest):
@@ -45,6 +51,17 @@ async def play_song(request: SongRequest):
         audio_resp = requests.post(f"{AUDIO_AGENT_URL}/search_and_play", json={"query": query}, timeout=60)
         audio_resp.raise_for_status()
         audio_data = audio_resp.json()
+        
+        # Store metadata for evaluation
+        # Assuming audio_data contains 'file_path' or we can derive it. 
+        # The Audio Agent returns 'url' which might be a local path or served URL.
+        # Let's check what Audio Agent returns. It usually returns a 'track' name.
+        # Ideally Audio Agent should return the absolute path for internal use.
+        # For now, let's assume the Audio Agent saves to 'songs/<track>.mp3' relative to project root.
+        # We'll try to reconstruct it or pass what we have.
+        
+        if 'file_path' in audio_data:
+             current_song_metadata['audio_path'] = audio_data['file_path']
         
         # 2. Fetch Lyrics
         lyrics_resp = requests.get(f"{LYRICS_AGENT_URL}/search_lyrics", params={"query": query}, timeout=10)
@@ -69,6 +86,61 @@ async def stop_song():
         return {"status": "stopped"}
     except Exception as e:
         logger.error(f"Error stopping audio: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/submit_performance")
+async def submit_performance(
+    audio_file: UploadFile = File(...),
+    personality: str = Form("strict_judge"),
+    reference_lyrics: str = Form(None)
+):
+    """
+    Orchestrates the evaluation process:
+    1. Send audio to Singing Evaluator.
+    2. Send results to Judge Agent.
+    3. Return feedback.
+    """
+    try:
+        logger.info("Received performance submission.")
+        
+        # 1. Send to Evaluator
+        audio_content = await audio_file.read()
+        
+        # Prepare multipart upload for evaluator
+        files = {'audio_file': ('performance.wav', audio_content, 'audio/wav')}
+        data = {}
+        if reference_lyrics:
+            data['reference_lyrics'] = reference_lyrics
+            
+        # Add reference audio path if available
+        if 'audio_path' in current_song_metadata:
+            data['reference_audio_path'] = current_song_metadata['audio_path']
+        
+        logger.info(f"Sending audio to Evaluator with metadata: {data.keys()}")
+        eval_resp = requests.post(f"{EVALUATOR_AGENT_URL}/evaluate_singing", files=files, data=data, timeout=120)
+        eval_resp.raise_for_status()
+        evaluation_result = eval_resp.json()
+        logger.info(f"Evaluator result: {evaluation_result}")
+        
+        # 2. Send to Judge
+        judge_payload = {
+            "evaluation_data": evaluation_result,
+            "personality": personality
+        }
+        
+        logger.info(f"Sending data to Judge ({personality})...")
+        judge_resp = requests.post(f"{JUDGE_AGENT_URL}/evaluate_performance", json=judge_payload, timeout=30)
+        judge_resp.raise_for_status()
+        judge_result = judge_resp.json()
+        
+        return {
+            "status": "success",
+            "evaluation": evaluation_result,
+            "feedback": judge_result["feedback"]
+        }
+
+    except Exception as e:
+        logger.error(f"Error processing performance: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
