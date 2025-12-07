@@ -18,14 +18,21 @@
             <button id="stop-btn">Stop</button>
         </div>
 
-        <div class="sync-controls" style="display: none;">
-            <button id="offset-minus" class="secondary-btn">Reward (-0.5s)</button>
-            <span id="offset-display">Offset: 0.0s</span>
-            <button id="offset-plus" class="secondary-btn">Forward (+0.5s)</button>
+        <div class="sync-controls" style="display: none; flex-direction: column; gap: 10px;">
+            <button id="sync-start-btn" class="primary-btn"
+                style="background-color: #e94560; font-weight: bold; padding: 10px 20px;">
+                SYNC TO 1ST LINE
+            </button>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button id="offset-minus" class="secondary-btn">Reward (-0.5s)</button>
+                <span id="offset-display">Offset: 0.0s</span>
+                <button id="offset-plus" class="secondary-btn">Forward (+0.5s)</button>
+            </div>
         </div>
 
         <div class="player-wrapper">
-            <audio id="audio-player" controls style="width: 100%; margin: 15px 0; display: none;"></audio>
+            <!-- HTML5 Video Player -->
+            <video id="video-player" controls style="width: 100%; max-height: 50vh; display: none;"></video>
         </div>
 
         <div id="status-message"></div>
