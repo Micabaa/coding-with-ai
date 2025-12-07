@@ -1,15 +1,29 @@
+let currentLyrics = [];
+let lyricOffset = 0.0;
+const videoPlayer = document.getElementById('video-player');
+const lyricsDiv = document.getElementById('lyrics-content');
+const statusDiv = document.getElementById('status-message');
+
+
 document.getElementById('play-btn').addEventListener('click', async () => {
     const query = document.getElementById('song-query').value;
-    const statusDiv = document.getElementById('status-message');
-    const lyricsDiv = document.getElementById('lyrics-content');
 
     if (!query) {
         alert("Please enter a song name!");
         return;
     }
 
-    statusDiv.textContent = "Searching and downloading... (this may take a moment)";
+    statusDiv.textContent = "Downloading video... (this may take 10-30 seconds)";
     lyricsDiv.innerHTML = '<p class="placeholder">Loading...</p>';
+
+    // Reset player
+    videoPlayer.pause();
+    videoPlayer.style.display = 'none';
+    videoPlayer.src = "";
+    document.querySelector('.sync-controls').style.display = 'none';
+
+    // Reset offset
+    updateOffsetDisplay(0.0);
 
     try {
         const response = await fetch('/api/play_song', {
@@ -25,19 +39,27 @@ document.getElementById('play-btn').addEventListener('click', async () => {
         }
 
         const data = await response.json();
-        
+
         statusDiv.textContent = `Playing: ${data.audio.track}`;
-        
-        // Display Lyrics
+
+        // Handle Video
+        if (data.audio.url) {
+            videoPlayer.src = data.audio.url;
+            videoPlayer.style.display = 'block';
+            document.querySelector('.sync-controls').style.display = 'flex';
+            videoPlayer.play().catch(e => console.log("Auto-play prevented:", e));
+
+            // Auto-Offset Removed - User will sync manually
+            updateOffsetDisplay(0.0);
+        }
+
+        // Handle Lyrics and Sync
         if (data.lyrics && data.lyrics.lyrics) {
-            lyricsDiv.innerHTML = '';
-            data.lyrics.lyrics.forEach(line => {
-                const p = document.createElement('p');
-                p.textContent = line.text;
-                lyricsDiv.appendChild(p);
-            });
+            currentLyrics = data.lyrics.lyrics;
+            renderLyrics(currentLyrics);
         } else {
             lyricsDiv.innerHTML = '<p class="placeholder">No lyrics found.</p>';
+            currentLyrics = [];
         }
 
     } catch (error) {
@@ -47,10 +69,100 @@ document.getElementById('play-btn').addEventListener('click', async () => {
 });
 
 document.getElementById('stop-btn').addEventListener('click', async () => {
+    videoPlayer.pause();
+    videoPlayer.currentTime = 0;
+    statusDiv.textContent = "Stopped.";
     try {
         await fetch('/api/stop_song', { method: 'POST' });
-        document.getElementById('status-message').textContent = "Stopped.";
     } catch (error) {
         console.error(error);
+    }
+});
+
+function renderLyrics(lyrics) {
+    lyricsDiv.innerHTML = '';
+    lyrics.forEach((line, index) => {
+        const p = document.createElement('p');
+        p.textContent = line.text;
+        p.id = `line-${index}`;
+        lyricsDiv.appendChild(p);
+    });
+}
+
+function updateOffsetDisplay(newOffset) {
+    if (newOffset !== undefined) {
+        lyricOffset = newOffset;
+    }
+    const display = document.getElementById('offset-display');
+    const sign = lyricOffset >= 0 ? '+' : '';
+    display.textContent = `Offset: ${sign}${lyricOffset.toFixed(1)}s`;
+}
+
+document.getElementById('offset-minus').addEventListener('click', () => {
+    updateOffsetDisplay(lyricOffset - 0.5);
+});
+
+document.getElementById('offset-plus').addEventListener('click', () => {
+    updateOffsetDisplay(lyricOffset + 0.5);
+});
+
+document.getElementById('sync-start-btn').addEventListener('click', () => {
+    if (!currentLyrics.length) {
+        alert("No lyrics loaded to sync with!");
+        return;
+    }
+
+    // Find the timestamp of the FIRST lyric line
+    const firstLineTime = currentLyrics[0].timestamp; // Assuming sorted lyrics
+    const currentTime = videoPlayer.currentTime;
+
+    // Offset = FirstLine - Current
+    const newOffset = firstLineTime - currentTime;
+    updateOffsetDisplay(newOffset);
+
+    // Feedback
+    statusDiv.textContent = `Synced to start! Offset: ${newOffset.toFixed(2)}s`;
+});
+
+let lastHighlightedIndex = -1;
+
+function highlightLine(index) {
+    if (index === lastHighlightedIndex) return;
+
+    if (lastHighlightedIndex !== -1) {
+        const prev = document.getElementById(`line-${lastHighlightedIndex}`);
+        if (prev) prev.classList.remove('highlight');
+    }
+
+    const current = document.getElementById(`line-${index}`);
+    if (current) {
+        current.classList.add('highlight');
+        current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
+
+    lastHighlightedIndex = index;
+}
+
+// Synchronization Logic using HTML5 Video Event
+videoPlayer.addEventListener('timeupdate', () => {
+    const currentTime = videoPlayer.currentTime;
+    const effectiveTime = currentTime + lyricOffset; // Apply offset
+
+    if (!currentLyrics.length) return;
+
+    let activeIndex = -1;
+    for (let i = 0; i < currentLyrics.length; i++) {
+        if (currentLyrics[i].timestamp <= effectiveTime) {
+            activeIndex = i;
+        } else {
+            break;
+        }
+    }
+
+    if (activeIndex !== -1) {
+        highlightLine(activeIndex);
     }
 });
