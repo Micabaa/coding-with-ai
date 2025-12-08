@@ -1,0 +1,87 @@
+.profile-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+.profile-card {
+    background: rgba(10, 15, 35, 0.8);
+    border: 1px solid var(--color-cyan);
+    padding: 3rem;
+    border-radius: 20px;
+    text-align: center;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.profile-icon {
+    color: var(--color-gold);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 50%;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    text-align: left;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    color: var(--color-cyan);
+}
+
+.input-group input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--color-magenta);
+    padding: 0.8rem;
+    color: var(--color-gold);
+    font-size: 1.1rem;
+    border-radius: 8px;
+    outline: none;
+}
+
+.input-group input:focus {
+    box-shadow: 0 0 10px var(--color-magenta);
+}
+
+.save-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-magenta);
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+.save-btn:hover {
+    background: #d900d9;
+    box-shadow: 0 0 15px var(--color-magenta);
+}
+
+.success-msg {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

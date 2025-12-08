@@ -23,7 +23,8 @@ async def evaluate_singing(
     audio_file: UploadFile = File(None),
     reference_lyrics: str = Form(None),
     performance_segment_id: str = Form(None),
-    reference_audio_path: str = Form(None)
+    reference_audio_path: str = Form(None),
+    offset: float = Form(0.0)
 ):
     """
     Analyzes singing audio to provide pitch and rhythm scores.
