@@ -1,0 +1,60 @@
+INFO:     Started server process [89956]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:__main__:Searching syncedlyrics for: suzanne by raye
+INFO:syncedlyrics:Lyrics found for "suzanne by raye" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:61684 - "GET /search_lyrics?query=suzanne+by+raye HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: kiss it better rihanna
+INFO:syncedlyrics:Lyrics found for "kiss it better rihanna" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:61798 - "GET /search_lyrics?query=kiss+it+better+rihanna HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: so high doja cat
+INFO:syncedlyrics:Lyrics found for "so high doja cat" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:61858 - "GET /search_lyrics?query=so+high+doja+cat HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: free by rumi
+INFO:syncedlyrics:Lyrics found for "free by rumi" on NetEase
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:61934 - "GET /search_lyrics?query=free+by+rumi HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: free by rumi
+INFO:syncedlyrics:Lyrics found for "free by rumi" on NetEase
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:61954 - "GET /search_lyrics?query=free+by+rumi HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: she's a rainbow by lola marsh
+INFO:syncedlyrics:Lyrics found for "she's a rainbow by lola marsh" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:62024 - "GET /search_lyrics?query=she%27s+a+rainbow+by+lola+marsh HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: like a tattoo sade
+INFO:syncedlyrics:Lyrics found for "like a tattoo sade" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:62083 - "GET /search_lyrics?query=like+a+tattoo+sade HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: like a tattoo by sade
+INFO:syncedlyrics:Lyrics found for "like a tattoo by sade" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:62097 - "GET /search_lyrics?query=like+a+tattoo+by+sade HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: skin tight ravyn lenae
+INFO:syncedlyrics:Lyrics found for "skin tight ravyn lenae" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:62208 - "GET /search_lyrics?query=skin+tight+ravyn+lenae HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: mystery of love by sufjan stevens
+INFO:syncedlyrics:Lyrics found for "mystery of love by sufjan stevens" on Lrclib
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:62276 - "GET /search_lyrics?query=mystery+of+love+by+sufjan+stevens HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: mystery of love by sufjan stevens
+INFO:syncedlyrics:Lyrics found for "mystery of love by sufjan stevens" on Lrclib
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:62316 - "GET /search_lyrics?query=mystery+of+love+by+sufjan+stevens HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: every summertime by niki
+INFO:syncedlyrics:Lyrics found for "every summertime by niki" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:62449 - "GET /search_lyrics?query=every+summertime+by+niki HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: valentine by laufey
+INFO:syncedlyrics:Lyrics found for "valentine by laufey" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:62586 - "GET /search_lyrics?query=valentine+by+laufey HTTP/1.1" 200 OK
+INFO:__main__:Searching syncedlyrics for: valentine by laufey
+INFO:syncedlyrics:Lyrics found for "valentine by laufey" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:62622 - "GET /search_lyrics?query=valentine+by+laufey HTTP/1.1" 200 OK

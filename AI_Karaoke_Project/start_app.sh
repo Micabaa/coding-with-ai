@@ -13,7 +13,7 @@ echo "✅ Python 3 found."
 
 # 2. Install Dependencies
 echo "📦 Installing dependencies..."
-pip3 install -r requirements.txt
+pip3 install -r requirements.txt --break-system-packages
 if [ $? -ne 0 ]; then
     echo "❌ Failed to install dependencies."
     exit 1
