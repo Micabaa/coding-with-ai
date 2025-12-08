@@ -236,3 +236,13 @@
 2025-12-08 01:00:40,587 | INFO | Received evaluation for segment=None with personality=strict_judge
 2025-12-08 01:00:42,565 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2025-12-08 01:00:42,569 | INFO | Feedback successfully generated: Pitch unstable; rhythm is lacking precision. Elevate your vocal power....
+2025-12-08 01:16:10,190 | INFO | Received evaluation for segment=None with personality=supportive_grandma
+2025-12-08 01:16:12,261 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 01:16:12,271 | INFO | Feedback successfully generated: Oh, sweetie! You gave it your all, and that's what truly matters! I can see you'...
+2025-12-08 01:26:12,000 | INFO | Received evaluation for segment=None with personality=strict_judge
+2025-12-08 01:26:13,488 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 01:26:13,498 | INFO | Feedback successfully generated: Pitch unstable, with significant rhythm inconsistencies. Support your vocal powe...
+2025-12-08 01:29:01,795 | INFO | Received evaluation for segment=None with personality=overly_enthusiastic
+2025-12-08 01:29:01,796 | WARNING | Prompt overly_enthusiastic_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 01:29:03,476 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 01:29:03,479 | INFO | Feedback successfully generated: Pitch unstable; rhythm lacks precision. Support the high notes....

@@ -12,7 +12,31 @@
     <div class="container">
         <h1>🎤 AI Karaoke Host</h1>
 
-        <div class="controls">
+        <!-- Chat Interface -->
+        <div class="chat-container"
+            style="margin-bottom: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 8px; background: #fff;">
+            <div id="chat-history"
+                style="height: 200px; overflow-y: auto; margin-bottom: 10px; border: 1px solid #eee; padding: 10px; background: #f9f9f9;">
+                <div class="message system"><strong>Host:</strong> Hello! I'm your AI Karaoke Host. What would you like
+                    to sing?</div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="chat-input"
+                    placeholder="Type your request here (e.g., 'I want to sing Bohemian Rhapsody')..."
+                    style="flex-grow: 1; padding: 8px;">
+                <button id="send-chat-btn"
+                    style="padding: 8px 15px; background: #6c5ce7; color: white; border: none; border-radius: 4px; cursor: pointer;">Send</button>
+            </div>
+            <!-- Evaluation Controls -->
+            <div style="margin-top: 10px; text-align: right;">
+                <button id="stop-evaluate-btn"
+                    style="padding: 8px 15px; background: #e94560; color: white; border: none; border-radius: 4px; cursor: pointer; display: none;">⏹
+                    Stop & Evaluate</button>
+            </div>
+        </div>
+
+        <div class="controls" style="opacity: 0.5; pointer-events: none; display: none;">
+            <!-- Hidden/Disabled manual controls for now -->
             <input type="text" id="song-query" placeholder="Enter song name..." />
             <select id="personality-select" style="padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
                 <option value="strict_judge">Strict Judge</option>
