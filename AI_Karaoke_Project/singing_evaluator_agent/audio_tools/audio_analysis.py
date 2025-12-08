@@ -97,27 +97,42 @@ def calculate_timing_score(y, sr, reference_lyrics):
         # Infer end time from next line or default duration
         if i < len(sorted_lyrics) - 1:
             next_start = float(sorted_lyrics[i+1].get('timestamp', sorted_lyrics[i+1].get('start_time', 0)))
-            end = next_start
+            time_gap = next_start - start
         else:
-            end = start + 5.0 # Default 5s for last line
+            time_gap = 5.0 # Default buffer
             
-        duration = end - start
+        # Estimate expected singing duration based on word count
+        # Typical singing speed: 0.4s - 0.6s per word.
+        words = lyric.get('text', '').split()
+        num_words = len(words) if words else 1
+        estimated_duration = num_words * 0.6 # Generous 0.6s per word
         
-        if duration <= 0:
-            continue
+        # The 'target' duration is the lesser of the Time Gap (if lines overlap fast) or Estimated Duration
+        # This effectively ignores the empty space (silence) at the end of a line.
+        target_duration = min(time_gap, estimated_duration)
+        
+        # Don't let target be zero
+        target_duration = max(0.5, target_duration)
             
-        total_lyric_duration += duration
+        total_lyric_duration += target_duration
         
-        # Check overlap
+        # Check overlap within the FULL time gap (we allow user to sing anywhere in the gap)
+        # But we only expect them to fill 'target_duration' amount of it.
+        # Define the window to check
+        window_end = start + time_gap
+        
         for sing_start, sing_end in singing_intervals:
             overlap_start = max(start, sing_start)
-            overlap_end = min(end, sing_end)
+            overlap_end = min(window_end, sing_end)
             
             if overlap_end > overlap_start:
                 total_overlap_duration += (overlap_end - overlap_start)
     
     if total_lyric_duration > 0:
+        # Cap score at 1.0 (if they sing longer than expected, that's fine/enthusiasm)
         score = min(1.0, total_overlap_duration / total_lyric_duration)
+        # Boost it slightly to be more encouraging
+        score = min(1.0, score * 1.2)
     else:
         score = 0.0
         
