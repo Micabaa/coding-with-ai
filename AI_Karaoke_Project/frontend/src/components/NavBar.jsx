@@ -7,7 +7,11 @@ const NavBar = () => {
     return (
         <nav className="navbar">
             <div className="navbar-logo text-glow-magenta">
+<<<<<<< HEAD
                 KaraOKAI
+=======
+                NEON KARAOKE
+>>>>>>> e283173f24e75173a1afd9c8e4ccbb69ec86c90c
             </div>
             <div className="navbar-links">
                 <NavLink to="/" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>

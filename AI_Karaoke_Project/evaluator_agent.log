@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 INFO:     Started server process [48764]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
@@ -7,3 +8,37 @@ INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
 INFO:     Finished server process [48764]
 🎤 Starting Singing Evaluator Agent FastAPI Server...
+=======
+INFO:     Started server process [47080]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8003 (Press CTRL+C to quit)
+INFO:SingingEvaluator:Analyzing audio file: /var/folders/8t/3vcwxw8d1wl7lbzxzw1zrlh00000gn/T/tmpc2f8d1kk.wav
+/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:316: UserWarning: PySoundFile failed. Trying audioread instead.
+  y, sr = librosa.load(audio_path, sr=None)
+/Users/miabaudri/coding-with-ai/.venv/lib/python3.13/site-packages/librosa/core/audio.py:184: FutureWarning: librosa.core.audio.__audioread_load
+	Deprecated as of librosa version 0.10.0.
+	It will be removed in librosa version 1.0.
+  y, sr_native = __audioread_load(path, offset, duration, dtype)
+INFO:audio_tools.audio_analysis:Audio Duration: 25.31s
+INFO:audio_tools.audio_analysis:Total Reference Lyrics: 33
+INFO:audio_tools.audio_analysis:First Lyric Timestamp: 0.43
+INFO:audio_tools.audio_analysis:Relevant Lyrics Count: 4
+/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:143: UserWarning: PySoundFile failed. Trying audioread instead.
+  y_ref, _ = librosa.load(reference_audio_path, sr=sr_user, duration=60)
+/Users/miabaudri/coding-with-ai/.venv/lib/python3.13/site-packages/librosa/core/audio.py:184: FutureWarning: librosa.core.audio.__audioread_load
+	Deprecated as of librosa version 0.10.0.
+	It will be removed in librosa version 1.0.
+  y, sr_native = __audioread_load(path, offset, duration, dtype)
+INFO:audio_tools.audio_analysis:DTW Analysis: Distance=4908.32, Avg=0.9289 -> Score=0.1560
+/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:248: UserWarning: PySoundFile failed. Trying audioread instead.
+  y_ref, _ = librosa.load(reference_audio_path, sr=sr_user, duration=user_duration + 5)
+/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:33: UserWarning: PySoundFile failed. Trying audioread instead.
+  y, sr = librosa.load(audio_path, sr=None)
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 200 OK"
+INFO:audio_tools.audio_analysis:Transcribed: 'I talk too much, I talk too much' -> Score: 0.2682926829268293
+INFO:audio_tools.audio_analysis:Audio analysis complete: {'overall_score': np.float64(0.4913960326678097), 'pitch_accuracy_score': 0.7200000000000001, 'rhythm_score': np.float64(0.4858954150765995), 'lyrics_score': 0.2682926829268293, 'vocal_power': 'low', 'transcribed_text': 'I talk too much, I talk too much', 'pitch_detail': {'high': 0.1, 'low': 0.16, 'perfect': 0.75}, 'lyrics_diff': [{'word': 'Ha!', 'status': 'missing'}, {'word': 'Golden,', 'status': 'missing'}, {'word': 'golden,', 'status': 'missing'}, {'word': 'golden', 'status': 'missing'}, {'word': 'as', 'status': 'missing'}, {'word': 'I', 'status': 'matched'}, {'word': 'open', 'status': 'missing'}, {'word': 'my', 'status': 'missing'}, {'word': 'eyes', 'status': 'missing'}, {'word': 'Hold', 'status': 'missing'}, {'word': 'it,', 'status': 'missing'}, {'word': 'focus,', 'status': 'missing'}, {'word': 'hoping,', 'status': 'missing'}, {'word': 'take', 'status': 'missing'}, {'word': 'me', 'status': 'missing'}, {'word': 'back', 'status': 'missing'}, {'word': 'to', 'status': 'wrong', 'heard': 'talk'}, {'word': 'the', 'status': 'wrong', 'heard': 'too'}, {'word': 'light', 'status': 'wrong', 'heard': 'much'}, {'word': 'I', 'status': 'matched'}, {'word': 'know', 'status': 'missing'}, {'word': 'you', 'status': 'missing'}, {'word': 'were', 'status': 'missing'}, {'word': 'way', 'status': 'wrong', 'heard': 'talk'}, {'word': 'too', 'status': 'matched'}, {'word': 'bright', 'status': 'missing'}, {'word': 'for', 'status': 'missing'}, {'word': 'me', 'status': 'wrong', 'heard': 'much'}], 'emotion_detected': 'neutral', 'audio_duration': 25.30829931972789, 'average_scores': {'overall': np.float64(0.4913960326678097), 'pitch': 0.7200000000000001, 'rhythm': np.float64(0.4858954150765995), 'lyrics': 0.2682926829268293}}
+INFO:SingingEvaluator:Cleaned up temp file: /var/folders/8t/3vcwxw8d1wl7lbzxzw1zrlh00000gn/T/tmpc2f8d1kk.wav
+🎤 Starting Singing Evaluator Agent FastAPI Server...
+INFO:     127.0.0.1:51782 - "POST /evaluate_singing HTTP/1.1" 200 OK
+>>>>>>> e283173f24e75173a1afd9c8e4ccbb69ec86c90c

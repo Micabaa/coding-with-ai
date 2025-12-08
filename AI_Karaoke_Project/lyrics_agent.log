@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 INFO:     Started server process [48763]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
@@ -6,3 +7,13 @@ INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
 INFO:     Finished server process [48763]
+=======
+INFO:     Started server process [47079]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:__main__:Searching syncedlyrics for: golden harry styles
+INFO:syncedlyrics:Lyrics found for "golden harry styles" on Musixmatch
+INFO:__main__:Found synced lyrics!
+INFO:     127.0.0.1:51710 - "GET /search_lyrics?query=golden+harry+styles HTTP/1.1" 200 OK
+>>>>>>> e283173f24e75173a1afd9c8e4ccbb69ec86c90c

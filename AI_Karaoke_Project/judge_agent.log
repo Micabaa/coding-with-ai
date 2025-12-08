@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 INFO:     Started server process [48765]
+=======
+INFO:     Started server process [47081]
+>>>>>>> e283173f24e75173a1afd9c8e4ccbb69ec86c90c
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8004 (Press CTRL+C to quit)
@@ -7,3 +11,7 @@ INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
 INFO:     Finished server process [48765]
 🎤 Starting Judge Agent FastAPI Server...
+<<<<<<< HEAD
+=======
+INFO:     127.0.0.1:51796 - "POST /evaluate_performance HTTP/1.1" 200 OK
+>>>>>>> e283173f24e75173a1afd9c8e4ccbb69ec86c90c
