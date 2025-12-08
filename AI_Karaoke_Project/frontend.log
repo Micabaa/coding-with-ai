@@ -3,11 +3,7 @@
 > vite
 
 
-<<<<<<< HEAD
-  VITE v7.2.6  ready in 183 ms
-=======
-  VITE v7.2.6  ready in 189 ms
->>>>>>> e283173f24e75173a1afd9c8e4ccbb69ec86c90c
+  VITE v7.2.6  ready in 112 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose

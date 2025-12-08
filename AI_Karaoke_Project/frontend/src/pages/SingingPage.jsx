@@ -32,6 +32,9 @@ const SingingPage = ({ mode = 'casual' }) => {
     const [feedback, setFeedback] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Judge Selection
+    const [judgePersonality, setJudgePersonality] = useState(mode === 'competition' ? 'strict_judge' : 'friendly');
+
     // Search Handler
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -139,7 +142,7 @@ const SingingPage = ({ mode = 'casual' }) => {
                 if (event.data.size > 0) audioChunksRef.current.push(event.data);
             };
 
-            mediaRecorderRef.current.start();
+            mediaRecorderRef.current.start(1000); // Collect chunks every second
         } catch (err) {
             console.error("Mic access denied", err);
             alert("Microphone access is required for scoring!");
@@ -147,9 +150,19 @@ const SingingPage = ({ mode = 'casual' }) => {
     };
 
     const stopRecording = () => {
-        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        return new Promise((resolve) => {
+            if (!mediaRecorderRef.current || mediaRecorderRef.current.state === 'inactive') {
+                resolve();
+                return;
+            }
+
+            mediaRecorderRef.current.onstop = () => {
+                console.log("Recorder stopped, chunks:", audioChunksRef.current.length);
+                resolve();
+            };
+
             mediaRecorderRef.current.stop();
-        }
+        });
     };
 
     // Play/Pause Handler
@@ -190,50 +203,55 @@ const SingingPage = ({ mode = 'casual' }) => {
     }, [viewState]);
 
     const finishSong = async () => {
-        stopRecording();
-        setIsSubmitting(true);
         if (videoRef.current) videoRef.current.pause();
 
-        // Wait for recorder to stop and chunks to gather
-        setTimeout(async () => {
-            const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-            const formData = new FormData();
-            formData.append('audio_file', audioBlob, 'performance.wav');
-            formData.append('personality', mode === 'competition' ? 'strict_judge' : 'friendly');
-            formData.append('reference_lyrics', JSON.stringify(lyrics)); // Pass lyrics for better sync check
-            formData.append('offset', offset.toString()); // Pass sync offset
+        // Wait for recording to actually stop and flush data
+        await stopRecording();
 
-            try {
-                const res = await axios.post('/api/submit_performance', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
+        setIsSubmitting(true);
+
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        console.log("Final Blob Size:", audioBlob.size);
+
+        const formData = new FormData();
+        formData.append('audio_file', audioBlob, 'performance.wav');
+        formData.append('personality', judgePersonality);
+        formData.append('reference_lyrics', JSON.stringify(lyrics)); // Pass lyrics for better sync check
+        formData.append('offset', offset.toString()); // Pass sync offset
+        if (songData && songData.file_path) {
+            formData.append('reference_audio_path', songData.file_path);
+        }
+
+        try {
+            const res = await axios.post('/api/submit_performance', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            setEvaluation(res.data.evaluation);
+            setFeedback(res.data.feedback);
+            setViewState('evaluation');
+
+            // Save Score
+            const userName = localStorage.getItem('karaoke_user_name') || 'Anonymous';
+            const score = Math.floor((res.data.evaluation.overall_score || 0) * 10000);
+
+            // Only save if score > 0
+            if (score > 0) {
+                await axios.post('/api/save_score', {
+                    user_name: userName,
+                    score: score,
+                    mode: mode,
+                    song: songData.title
                 });
-
-                setEvaluation(res.data.evaluation);
-                setFeedback(res.data.feedback);
-                setViewState('evaluation');
-
-                // Save Score
-                const userName = localStorage.getItem('karaoke_user_name') || 'Anonymous';
-                const score = Math.floor((res.data.evaluation.overall_score || 0) * 10000);
-
-                // Only save if score > 0
-                if (score > 0) {
-                    await axios.post('/api/save_score', {
-                        user_name: userName,
-                        score: score,
-                        mode: mode,
-                        song: songData.title
-                    });
-                }
-
-            } catch (err) {
-                console.error(err);
-                alert("Evaluation failed.");
-                setViewState('search');
-            } finally {
-                setIsSubmitting(false);
             }
-        }, 1000);
+
+        } catch (err) {
+            console.error(err);
+            alert("Evaluation failed.");
+            setViewState('search');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleVideoEnded = () => {
@@ -249,13 +267,47 @@ const SingingPage = ({ mode = 'casual' }) => {
                     <Search className="search-icon" />
                     <input
                         type="text"
-                        placeholder="Search for a song..."
+                        placeholder={isLoadingSong ? "Fetching song..." : "Enter song title (e.g. Bohemian Rhapsody)..."}
                         value={query}
-                        onChange={e => setQuery(e.target.value)}
-                        autoFocus
+                        onChange={(e) => setQuery(e.target.value)}
+                        disabled={isLoadingSong}
                     />
                     <button type="submit">GO</button>
                 </form>
+
+                <div className="judge-toggle-container">
+                    <span className="judge-label">Judge:</span>
+                    <div className="judge-toggle">
+                        <button
+                            className={`judge-btn ${judgePersonality === 'friendly' ? 'active' : ''}`}
+                            onClick={() => setJudgePersonality('friendly')}
+                            title="Supportive Grandma"
+                        >
+                            👵 Friendly
+                        </button>
+                        <button
+                            className={`judge-btn ${judgePersonality === 'strict_judge' ? 'active' : ''}`}
+                            onClick={() => setJudgePersonality('strict_judge')}
+                            title="Strict Judge"
+                        >
+                            👨‍⚖️ Strict
+                        </button>
+                        <button
+                            className={`judge-btn ${judgePersonality === 'overly_enthusiastic' ? 'active' : ''}`}
+                            onClick={() => setJudgePersonality('overly_enthusiastic')}
+                            title="Hype Man"
+                        >
+                            🤩 Hype
+                        </button>
+                        <button
+                            className={`judge-btn ${judgePersonality === 'lazy_critic' ? 'active' : ''}`}
+                            onClick={() => setJudgePersonality('lazy_critic')}
+                            title="Lazy Critic"
+                        >
+                            😴 Lazy
+                        </button>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -331,6 +383,9 @@ const SingingPage = ({ mode = 'casual' }) => {
                 {evaluation.lyrics_diff && (
                     <div className="lyrics-feedback box-glow">
                         <h3>Lyrics Accuracy</h3>
+                        {/* Debug Log */}
+                        {console.log("Evaluation Data:", evaluation)}
+
                         <div className="diff-text">
                             {evaluation.lyrics_diff.map((wordObj, idx) => (
                                 <span
@@ -342,6 +397,12 @@ const SingingPage = ({ mode = 'casual' }) => {
                                 </span>
                             ))}
                         </div>
+                        {evaluation.transcribed_text && (
+                            <div className="transcribed-text" style={{ marginTop: '1rem', borderTop: '1px solid #333', paddingTop: '1rem' }}>
+                                <p style={{ color: '#888', fontSize: '0.9rem' }}>What we heard:</p>
+                                <p style={{ fontStyle: 'italic', color: '#ccc' }}>"{evaluation.transcribed_text}"</p>
+                            </div>
+                        )}
                     </div>
                 )}
 

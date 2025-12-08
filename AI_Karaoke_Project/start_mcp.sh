@@ -17,8 +17,10 @@ pip3 install -r requirements.txt --break-system-packages > /dev/null 2>&1
 
 # Function to kill processes on specific ports
 cleanup_ports() {
-    echo "🧹 Cleaning up ports 8000-8004..."
-    for PORT in {8000..8004}; do
+    echo "🧹 Cleaning up ports 8000-8004 and 5173-5174..."
+    # Combine backend and frontend ports logic
+    PORTS=(8000 8001 8002 8003 8004 5173 5174)
+    for PORT in "${PORTS[@]}"; do
         # Find all PIDs using the port
         PIDS=$(lsof -ti:$PORT)
         if [ ! -z "$PIDS" ]; then
@@ -31,8 +33,9 @@ cleanup_ports() {
     echo "   Waiting for ports to be released..."
     sleep 2
     
+    
     # Verify ports are free
-    for PORT in {8000..8004}; do
+    for PORT in "${PORTS[@]}"; do
         if lsof -i:$PORT >/dev/null; then
             echo "❌ Port $PORT is still in use. Retrying cleanup..."
             PIDS=$(lsof -ti:$PORT)
@@ -46,6 +49,16 @@ cleanup_ports() {
 
 # Clean ports before starting
 cleanup_ports
+
+# 3. Start Frontend
+echo "🚀 Starting Frontend..."
+cd frontend
+npm run dev > ../frontend.log 2>&1 &
+FRONTEND_PID=$!
+cd ..
+
+# Trap to kill frontend on exit
+trap "kill $FRONTEND_PID 2>/dev/null; echo 'Frontend stopped.'" EXIT
 
 # 3. Run Agentic Host
 # This is an interactive CLI, so we run it in foreground.

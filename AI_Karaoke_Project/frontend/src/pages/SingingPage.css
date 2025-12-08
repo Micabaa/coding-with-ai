@@ -57,6 +57,52 @@
     box-shadow: 0 0 10px white;
 }
 
+.judge-toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+}
+
+.judge-label {
+    font-weight: bold;
+    color: var(--color-gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.judge-toggle {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.judge-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.judge-btn:hover {
+    border-color: white;
+    color: white;
+}
+
+.judge-btn.active {
+    background: var(--color-magenta);
+    border-color: var(--color-magenta);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 0 10px var(--color-magenta);
+}
+
 /* Singing Interface */
 .singing-interface {
     height: calc(100vh - 80px);

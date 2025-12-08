@@ -54,7 +54,8 @@ async def evaluate_singing(
         evaluation_result = analyze_audio(
             temp_audio_path, 
             reference_lyrics=lyrics_data,
-            reference_audio_path=reference_audio_path
+            reference_audio_path=reference_audio_path,
+            offset=offset
         )
         
         # Add segment ID if provided

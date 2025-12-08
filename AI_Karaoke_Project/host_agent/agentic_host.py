@@ -209,6 +209,25 @@ class ChatResponse(BaseModel):
     response: str
     action: Optional[dict] = None
 
+class SongRequest(BaseModel):
+    query: str
+
+# LEADERBOARD PERSISTENCE
+LEADERBOARD_FILE = BASE_DIR / "leaderboard.json"
+
+def load_leaderboard():
+    if not LEADERBOARD_FILE.exists():
+        return {"casual": [], "competition": []}
+    try:
+        with open(LEADERBOARD_FILE, "r") as f:
+            return json.load(f)
+    except Exception:
+        return {"casual": [], "competition": []}
+
+def save_leaderboard(data):
+    with open(LEADERBOARD_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
 # Global Host Instance
 host_agent = None
 
@@ -256,6 +275,47 @@ async def get_lyrics(query: str):
     except json.JSONDecodeError:
         return {"error": "Invalid JSON from lyrics agent", "raw": result_json}
 
+@app.post("/api/play_song")
+async def play_song(request: SongRequest):
+    if not host_agent:
+        raise HTTPException(status_code=503, detail="Host not initialized")
+    
+    query = request.query
+    logger.info(f"MCP Host received play request for: {query}")
+
+    try:
+        # 1. Call Audio Agent via MCP
+        # Ensure tool name matches what audio mcp server exposes: 'play_song'
+        # The logs showed available tools: ['play_song', 'stop_song']
+        audio_result_str = await host_agent.call_tool("play_song", {"query": query})
+        if not audio_result_str:
+             raise HTTPException(status_code=500, detail="Audio agent returned no data")
+        
+        try:
+             audio_data = json.loads(audio_result_str)
+        except json.JSONDecodeError:
+             # Fallback if it returns raw string url or something (unlikely if consistent)
+             audio_data = {"url": audio_result_str, "track": query, "status": "unknown"}
+
+        # 2. Call Lyrics Agent via MCP
+        lyrics_result_str = await host_agent.call_tool("search_lyrics", {"query": query})
+        lyrics_data = {}
+        if lyrics_result_str:
+            try:
+                lyrics_data = json.loads(lyrics_result_str)
+            except json.JSONDecodeError:
+                lyrics_data = {"lyrics": [], "error": "Invalid lyrics json"}
+
+        return {
+            "status": "success",
+            "audio": audio_data,
+            "lyrics": lyrics_data
+        }
+
+    except Exception as e:
+        logger.error(f"Error in play_song: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/stop_song")
 async def stop_song():
     if not host_agent:
@@ -270,7 +330,8 @@ async def submit_performance(
     audio_file: UploadFile = File(...),
     personality: str = Form(...),
     reference_lyrics: str = Form(None),
-    reference_audio_path: str = Form(None)
+    reference_audio_path: str = Form(None),
+    offset: float = Form(0.0)
 ):
     if not host_agent:
         raise HTTPException(status_code=503, detail="Host not initialized")
@@ -285,7 +346,7 @@ async def submit_performance(
     
     try:
         # 2. Call Singing Evaluator
-        eval_args = {"audio_path": tmp_path}
+        eval_args = {"audio_path": tmp_path, "offset": offset}
         if reference_lyrics:
             eval_args["reference_lyrics_json"] = reference_lyrics
         if reference_audio_path:
@@ -321,10 +382,42 @@ async def submit_performance(
     except Exception as e:
         logger.error(f"Submission failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        # Cleanup
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
+
+@app.get("/api/leaderboard")
+async def get_leaderboard():
+    return load_leaderboard()
+
+@app.post("/api/save_score")
+async def save_score(request: Request):
+    """
+    Saves a score to the leaderboard.
+    """
+    data = await request.json()
+    user_name = data.get("user_name", "Anonymous")
+    score = data.get("score", 0)
+    mode = data.get("mode", "casual")
+    song_title = data.get("song", "Unknown Song")
+    
+    leaderboard = load_leaderboard()
+    
+    entry = {
+        "user_name": user_name,
+        "score": score,
+        "song": song_title,
+        "date": "Just now"
+    }
+    
+    if mode == "competition":
+        leaderboard["competition"].append(entry)
+        leaderboard["competition"].sort(key=lambda x: x["score"], reverse=True)
+    else:
+        leaderboard["casual"].append(entry)
+        leaderboard["casual"].sort(key=lambda x: x["score"], reverse=True)
+        
+    save_leaderboard(leaderboard)
+    return {"status": "success", "leaderboard": leaderboard}
 
 if __name__ == "__main__":
     import uvicorn

@@ -308,7 +308,7 @@ def analyze_pitch_detail(y_user, sr_user, reference_audio_path):
         logger.error(f"Detailed pitch analysis failed: {e}")
         return {"high": 0, "low": 0, "perfect": 0}
 
-def analyze_audio(audio_path, reference_lyrics=None, reference_audio_path=None):
+def analyze_audio(audio_path, reference_lyrics=None, reference_audio_path=None, offset=0.0):
     """
     Analyzes an audio file to extract pitch, rhythm, and other metrics.
     """
@@ -328,21 +328,26 @@ def analyze_audio(audio_path, reference_lyrics=None, reference_audio_path=None):
         # Filter lyrics to only those within the audio duration (plus buffer)
         # This prevents marking the rest of the song as "missing" if the user stops early.
         audio_duration = librosa.get_duration(y=y, sr=sr)
-        logger.info(f"Audio Duration: {audio_duration:.2f}s")
+        logger.info(f"Audio Duration: {audio_duration:.2f}s, Offset: {offset}s")
         
         relevant_lyrics = []
         if reference_lyrics:
             logger.info(f"Total Reference Lyrics: {len(reference_lyrics)}")
             if len(reference_lyrics) > 0:
                 first_ts = reference_lyrics[0].get('timestamp', reference_lyrics[0].get('start_time', 'N/A'))
-                logger.info(f"First Lyric Timestamp: {first_ts}")
+                logger.info(f"First Lyric Timestamp (Original): {first_ts}")
                 
             for line in reference_lyrics:
-                start = float(line.get('timestamp', line.get('start_time', 0)))
-                # If the line *starts* before the audio ends, it's relevant.
-                # Adding 5s buffer for trailing vocals.
-                if start < audio_duration + 5.0: 
-                    relevant_lyrics.append(line)
+                orig_start = float(line.get('timestamp', line.get('start_time', 0)))
+                # Shift timestamp by offset to match recording time
+                adjusted_start = orig_start - offset
+                
+                # If the line starts within the audio range (with small buffers)
+                if -2.0 < adjusted_start < audio_duration + 5.0: 
+                    # Create copy with adjusted timestamp
+                    new_line = line.copy()
+                    new_line['timestamp'] = adjusted_start
+                    relevant_lyrics.append(new_line)
         
         logger.info(f"Relevant Lyrics Count: {len(relevant_lyrics)}")
         if not relevant_lyrics and reference_lyrics:
