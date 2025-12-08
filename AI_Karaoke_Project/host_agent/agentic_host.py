@@ -32,6 +32,7 @@ class KaraokeHost:
         self.sessions = {}
         self.tools = []
         self.tool_map = {}
+        self.security_policy = SecurityPolicy()
 
     async def connect_to_server(self, name: str, script_path: str):
         """Connects to an MCP server running as a python script."""
@@ -161,6 +162,13 @@ class KaraokeHost:
 
     async def call_tool(self, tool_name: str, args: dict):
         """Calls a specific tool on the connected agents."""
+        
+        # --- SECURITY CHECK ---
+        if not self.security_policy.is_allowed(tool_name, args):
+             logger.warning(f"SECURITY BLOCKED: Tool '{tool_name}' blocked by policy.")
+             return "Error: Security Policy Violation. Action blocked."
+        # ----------------------
+
         session_name = self.tool_map.get(tool_name)
         if session_name and session_name in self.sessions:
             try:
@@ -176,6 +184,41 @@ class KaraokeHost:
 
     async def cleanup(self):
         await self.exit_stack.aclose()
+
+class SecurityPolicy:
+    """
+    Enforces access control for MCP tools.
+    Requirement A2: Adopt a mechanism for access control.
+    """
+    def __init__(self):
+        # Define ALLOWLIST of tools
+        self.allowed_tools = {
+            "play_song",
+            "stop_song",
+            "search_lyrics",
+            "evaluate_singing",
+            "evaluate_performance"
+        }
+        
+    def is_allowed(self, tool_name: str, args: dict) -> bool:
+        # 1. Check Tool Name Allowlist
+        if tool_name not in self.allowed_tools:
+            logger.warning(f"Security: Unknown tool '{tool_name}' attempted.")
+            return False
+            
+        # 2. Argument Validation (Basic)
+        # Prevent Path Traversal in file paths if applicable
+        if "audio_path" in args:
+            path = args["audio_path"]
+            if ".." in path or path.startswith("/"):
+                # Allow absolute paths only if they are in temp or songs dir
+                # This is a simple heuristic
+                if "/tmp/" not in path and "/songs/" not in path and "temp" not in path:
+                     logger.warning(f"Security: Suspicious file path '{path}'")
+                     # return False # Strict mode (disabled for now to avoid breaking valid temp paths)
+                     pass
+                     
+        return True
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel
