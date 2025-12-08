@@ -14,6 +14,12 @@
     },
     {
       "user_name": "MCP",
+      "score": 7516,
+      "song": "Erase me - Lizzy McAlpine, Jacob Collier (Original Key Karaoke) - Piano Instrumental Cover & Lyrics",
+      "date": "Just now"
+    },
+    {
+      "user_name": "MCP",
       "score": 7442,
       "song": "Erase me - Lizzy McAlpine, Jacob Collier (Original Key Karaoke) - Piano Instrumental Cover & Lyrics",
       "date": "Just now"
@@ -23,6 +29,12 @@
       "score": 6329,
       "song": "SYML - Where's My Love (Karaoke Version)",
       "date": "Just now"
+    },
+    {
+      "user_name": "Newww",
+      "score": 6282,
+      "song": "Billie Eilish - CHIHIRO (Karaoke Version)",
+      "timestamp": "2025-12-08T04:56:48.796778"
     },
     {
       "user_name": "MCP",
@@ -35,6 +47,12 @@
       "score": 5395,
       "song": "Sufjan Stevens - Mystery of Love (Karaoke Version)",
       "date": "Just now"
+    },
+    {
+      "user_name": "Newww",
+      "score": 5369,
+      "song": "Ma Meilleure Ennemie (ft. Pomme) - Stromae Karaoke [Background Vocals Included]",
+      "timestamp": "2025-12-08T04:38:46.309827"
     },
     {
       "user_name": "Mia",
@@ -67,6 +85,12 @@
       "date": "Just now"
     },
     {
+      "user_name": "MCP",
+      "score": 4490,
+      "song": "Billie Eilish - WILDFLOWER (Karaoke Version)",
+      "timestamp": "2025-12-08T04:24:27.849737"
+    },
+    {
       "user_name": "Mia",
       "score": 4000,
       "song": "Sufjan Stevens - Mystery of Love (Karaoke Version)",
@@ -91,6 +115,12 @@
       "date": "Just now"
     },
     {
+      "user_name": "Newww",
+      "score": 3557,
+      "song": "Billie Eilish - CHIHIRO (Karaoke Version)",
+      "timestamp": "2025-12-08T04:46:05.878275"
+    },
+    {
       "user_name": "Keggo",
       "score": 3533,
       "song": "SOMETHING ABOUT YOU Karaoke - EYEDRESS FT. DENT MAY Instrumental Lower Higher Female Original Key",
@@ -101,6 +131,12 @@
       "score": 3374,
       "song": "Erase me - Lizzy McAlpine, Jacob Collier (Original Key Karaoke) - Piano Instrumental Cover & Lyrics",
       "date": "Just now"
+    },
+    {
+      "user_name": "Newww",
+      "score": 3339,
+      "song": "Billie Eilish - CHIHIRO (Karaoke Version)",
+      "timestamp": "2025-12-08T04:47:38.779617"
     },
     {
       "user_name": "Mia",
@@ -151,5 +187,12 @@
       "date": "Just now"
     }
   ],
-  "competition": []
+  "competition": [
+    {
+      "user_name": "MCP",
+      "score": 6693,
+      "song": "Billie Eilish - WILDFLOWER (Karaoke Version)",
+      "timestamp": "2025-12-08T04:25:55.741302"
+    }
+  ]
 }

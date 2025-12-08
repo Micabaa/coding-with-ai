@@ -64,40 +64,59 @@
     border-collapse: collapse;
 }
 
-.leaderboard-table th {
+.leaderboard-table th,
+.leaderboard-table td {
+    padding: 1rem 1.5rem;
+    /* More horizontal padding */
     text-align: left;
-    padding: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /* Default left align */
+}
+
+.leaderboard-table th:first-child,
+.leaderboard-table td:first-child {
+    text-align: center;
+    width: 80px;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.leaderboard-table th:last-child,
+.leaderboard-table td:last-child {
+    text-align: right;
+    /* Date right align */
+}
+
+.leaderboard-table th:nth-child(4),
+.leaderboard-table td:nth-child(4) {
+    text-align: right;
+    /* Score right align */
+}
+
+.leaderboard-table th {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
     color: var(--color-cyan);
-    font-weight: 600;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
 }
 
 .leaderboard-table td {
-    padding: 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.leaderboard-table tr:last-child td {
-    border-bottom: none;
-}
-
-.singer-cell {
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
-.song-cell {
-    display: flex;
-    align-items: center;
-    color: #ccc;
+    vertical-align: middle;
 }
 
 .score-cell {
-    text-align: right;
     font-family: 'Courier New', monospace;
     font-size: 1.2rem;
     font-weight: bold;
     color: var(--color-gold);
+}
+
+.date-cell {
+    color: #888;
+    font-size: 0.85rem;
+    font-family: monospace;
 }
 
 .top-1 {
@@ -107,6 +126,8 @@
 .rank-cell {
     display: flex;
     align-items: center;
+    justify-content: center;
+    /* Center the star and number */
     gap: 0.5rem;
 }
 

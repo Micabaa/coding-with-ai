@@ -28,7 +28,7 @@ def download_video(query: str):
     # Updated ydl_opts based on the instruction
     # Updated ydl_opts based on the instruction
     ydl_opts = {
-        'format': 'bestvideo+bestaudio/best', # Get video!
+        'format': 'bestvideo[ext=mp4][vcodec^=avc1]+bestaudio[ext=m4a]/best[ext=mp4]/best', # Force h264 for browser playback
         'merge_output_format': 'mp4', # Force merge to mp4
         'outtmpl': os.path.join(SONGS_DIR, '%(id)s.%(ext)s'),
         'quiet': True,

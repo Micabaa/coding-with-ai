@@ -63,6 +63,7 @@ const LeaderboardPage = () => {
                                 <th>Singer</th>
                                 <th>Song</th>
                                 <th>Score</th>
+                                <th>Date</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -78,6 +79,9 @@ const LeaderboardPage = () => {
                                         {entry.song}
                                     </td>
                                     <td className="score-cell">{entry.score.toLocaleString()}</td>
+                                    <td className="date-cell">
+                                        {entry.timestamp ? new Date(entry.timestamp).toLocaleDateString() : '-'}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>

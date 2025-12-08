@@ -267,7 +267,7 @@ const SingingPage = ({ mode = 'casual' }) => {
                     <Search className="search-icon" />
                     <input
                         type="text"
-                        placeholder={isLoadingSong ? "Fetching song..." : "Enter song title (e.g. Bohemian Rhapsody)..."}
+                        placeholder={isLoadingSong ? "Fetching song..." : "Enter song title..."}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         disabled={isLoadingSong}
@@ -277,36 +277,42 @@ const SingingPage = ({ mode = 'casual' }) => {
 
                 <div className="judge-toggle-container">
                     <span className="judge-label">Judge:</span>
-                    <div className="judge-toggle">
-                        <button
-                            className={`judge-btn ${judgePersonality === 'friendly' ? 'active' : ''}`}
-                            onClick={() => setJudgePersonality('friendly')}
-                            title="Supportive Grandma"
-                        >
-                            👵 Friendly
-                        </button>
-                        <button
-                            className={`judge-btn ${judgePersonality === 'strict_judge' ? 'active' : ''}`}
-                            onClick={() => setJudgePersonality('strict_judge')}
-                            title="Strict Judge"
-                        >
-                            👨‍⚖️ Strict
-                        </button>
-                        <button
-                            className={`judge-btn ${judgePersonality === 'overly_enthusiastic' ? 'active' : ''}`}
-                            onClick={() => setJudgePersonality('overly_enthusiastic')}
-                            title="Hype Man"
-                        >
-                            🤩 Hype
-                        </button>
-                        <button
-                            className={`judge-btn ${judgePersonality === 'lazy_critic' ? 'active' : ''}`}
-                            onClick={() => setJudgePersonality('lazy_critic')}
-                            title="Lazy Critic"
-                        >
-                            😴 Lazy
-                        </button>
-                    </div>
+                    {mode === 'competition' ? (
+                        <div className="judge-locked-banner">
+                            🔒 <strong>COMPETITION MODE</strong>: Strict Judge Enforced
+                        </div>
+                    ) : (
+                        <div className="judge-toggle">
+                            <button
+                                className={`judge-btn ${judgePersonality === 'friendly' ? 'active' : ''}`}
+                                onClick={() => setJudgePersonality('friendly')}
+                                title="Supportive Grandma"
+                            >
+                                👵 Friendly
+                            </button>
+                            <button
+                                className={`judge-btn ${judgePersonality === 'strict_judge' ? 'active' : ''}`}
+                                onClick={() => setJudgePersonality('strict_judge')}
+                                title="Strict Judge"
+                            >
+                                👨‍⚖️ Strict
+                            </button>
+                            <button
+                                className={`judge-btn ${judgePersonality === 'overly_enthusiastic' ? 'active' : ''}`}
+                                onClick={() => setJudgePersonality('overly_enthusiastic')}
+                                title="Hype Man"
+                            >
+                                🤩 Hype
+                            </button>
+                            <button
+                                className={`judge-btn ${judgePersonality === 'lazy_critic' ? 'active' : ''}`}
+                                onClick={() => setJudgePersonality('lazy_critic')}
+                                title="Lazy Critic"
+                            >
+                                😴 Lazy
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         );

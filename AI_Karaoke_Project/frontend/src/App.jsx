@@ -4,6 +4,7 @@ import NavBar from './components/NavBar';
 import SingingPage from './pages/SingingPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import ProfilePage from './pages/ProfilePage';
+import ChatPage from './pages/ChatPage'; // New
 import ErrorBoundary from './components/ErrorBoundary';
 import './index.css';
 
@@ -19,6 +20,7 @@ function App() {
               <Route path="/leaderboard" element={<LeaderboardPage />} />
               <Route path="/competition" element={<SingingPage mode="competition" />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/chat" element={<ChatPage />} />
             </Routes>
           </div>
         </div>
