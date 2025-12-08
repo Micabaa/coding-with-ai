@@ -16,6 +16,7 @@
     text-shadow: 0 0 10px #F0DF8E;
 }
 
+/* Tabs */
 .leaderboard-tabs {
     display: flex;
     justify-content: center;
@@ -32,6 +33,13 @@
     font-size: 1.1rem;
     text-transform: uppercase;
     letter-spacing: 1px;
+    cursor: pointer;
+    /* Cursor hinzufügen */
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover:not(.active) {
+    box-shadow: 0 0 5px var(--color-cyan);
 }
 
 .tab-btn.active {
@@ -43,6 +51,10 @@
 .tab-btn.competition {
     border-color: var(--color-magenta);
     color: var(--color-magenta);
+}
+
+.tab-btn.competition:hover:not(.active) {
+    box-shadow: 0 0 5px var(--color-magenta);
 }
 
 .tab-btn.competition.active {
@@ -59,15 +71,16 @@
     min-height: 400px;
 }
 
+/* Tabelle Basis-Struktur */
 .leaderboard-table {
     width: 100%;
+    /* Korrektur: Fügt die Rahmen der Zellen zusammen, damit die Linien durchgängig sind */
     border-collapse: collapse;
 }
 
 .leaderboard-table th,
 .leaderboard-table td {
     padding: 1rem 1.5rem;
-    /* More horizontal padding */
     text-align: left;
     /* Default left align */
 }
@@ -101,9 +114,58 @@
     letter-spacing: 1px;
 }
 
+/* Tabellenkörperzeilen */
 .leaderboard-table td {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     vertical-align: middle;
+}
+
+/* Spaltenausrichtung und Breiten */
+
+/* 1. Rank-Spalte (Zentriert) */
+.leaderboard-table th:first-child,
+.leaderboard-table td:first-child {
+    /* WICHTIG: Die Zelle selbst wird zentriert */
+    text-align: center;
+    width: 80px;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* 4. Score-Spalte (Rechtsbündig) */
+.leaderboard-table th:nth-child(4),
+.leaderboard-table td:nth-child(4) {
+    text-align: right;
+}
+
+/* 5. Date-Spalte (Rechtsbündig) */
+.leaderboard-table th:last-child,
+.leaderboard-table td:last-child {
+    text-align: right;
+}
+
+/* Zellinhalte */
+.singer-cell {
+    color: var(--color-cyan);
+    font-weight: 500;
+}
+
+.song-cell {
+    color: #ccc;
+    /* Die TD sollte nicht flex sein, aber wir stellen sicher, dass der Inhalt oben bündig ist, 
+       was bei textlastigen Tabellen oft besser aussieht */
+    vertical-align: middle;
+}
+
+/* NEU: Flex-Ausrichtung auf den Inhalt anwenden */
+.song-content {
+    display: flex;
+    align-items: center;
+    /* Dies zentriert Icon und Text vertikal im Wrapper */
+    gap: 8px;
+    /* Abstand zwischen Icon und Text */
+    height: 100%;
+    /* Stellt sicher, dass der Wrapper die gesamte Zellenhöhe nutzt */
 }
 
 .score-cell {
@@ -119,17 +181,22 @@
     font-family: monospace;
 }
 
-.top-1 {
-    background: linear-gradient(90deg, rgba(240, 223, 142, 0.1) 0%, transparent 100%);
+/* Rank-Zelle Korrektur */
+.rank-cell {
+    /* Nur noch Text-Ausrichtung, kein Flexbox auf TD */
+    text-align: center;
 }
 
-.rank-cell {
+/* Füge in der JSX-Datei ein <span className="rank-content"> um {index + 1} und <Star/> ein! */
+.rank-content {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Center the star and number */
     gap: 0.5rem;
+    width: 100%;
+    /* Wichtig, damit die Zentrierung in der TD funktioniert */
 }
+
 
 .loading,
 .empty-state {
@@ -137,4 +204,45 @@
     padding: 3rem;
     font-size: 1.2rem;
     color: #aaa;
+}
+
+/* TOP 3 Highlighting */
+.leaderboard-table tr.top-1 {
+    background: linear-gradient(90deg, rgba(240, 223, 142, 0.15) 0%, transparent 100%);
+    box-shadow: inset 0 0 10px rgba(240, 223, 142, 0.5);
+    color: #F0DF8E;
+    /* Textfarbe auf Gold ändern */
+}
+
+.leaderboard-table tr.top-2 {
+    background: linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, transparent 100%);
+    box-shadow: inset 0 0 8px rgba(192, 192, 192, 0.4);
+    color: #C0C0C0;
+}
+
+.leaderboard-table tr.top-3 {
+    background: linear-gradient(90deg, rgba(205, 127, 50, 0.1) 0%, transparent 100%);
+    box-shadow: inset 0 0 6px rgba(205, 127, 50, 0.3);
+    color: #CD7F32;
+}
+
+/* Stellen sicher, dass der Score-Text in den Top-Zeilen seine eigene Farbe behält oder hervorgehoben wird */
+.leaderboard-table tr.top-1 .score-cell {
+    color: white;
+    text-shadow: 0 0 5px #F0DF8E;
+}
+
+.song-cell {
+    /* Die TD selbst braucht keine besonderen Flex-Eigenschaften mehr, 
+       nur das Padding und die vertikale Ausrichtung der TD */
+    color: #ccc;
+}
+
+/* NEU: Flex-Ausrichtung auf den Inhalt anwenden */
+.song-content {
+    display: flex;
+    /* <-- Flex-Eigenschaft hierhin verschoben */
+    align-items: center;
+    gap: 8px;
+    /* Abstand zwischen Icon und Text (kann 'marginRight: 8' im JSX ersetzen) */
 }

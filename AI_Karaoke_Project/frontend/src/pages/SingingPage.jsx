@@ -5,8 +5,13 @@ import './SingingPage.css';
 import LoadingOverlay from '../components/LoadingOverlay';
 
 const SingingPage = ({ mode = 'casual' }) => {
-    // States: 'search', 'playing', 'evaluation'
-    const [viewState, setViewState] = useState('search');
+    // States: 'search', 'playing', 'evaluation', 'battle_setup', 'battle_intermission', 'battle_reveal'
+    const [viewState, setViewState] = useState(mode === 'competition' ? 'battle_setup' : 'search');
+
+    // Battle Mode Data
+    const [battlePlayers, setBattlePlayers] = useState({ p1: '', p2: '' });
+    const [battleScores, setBattleScores] = useState({ p1: null, p2: null });
+    const [currentTurn, setCurrentTurn] = useState('p1'); // 'p1' or 'p2'
 
     // Data
     const [query, setQuery] = useState('');
@@ -98,10 +103,22 @@ const SingingPage = ({ mode = 'casual' }) => {
         }
     };
 
+    // Handle Start Battle
+    const handleStartBattle = (e) => {
+        e.preventDefault();
+        if (battlePlayers.p1 && battlePlayers.p2) {
+            setViewState('search');
+        } else {
+            alert("Please enter both player names!");
+        }
+    };
+
     // Search Handler
     const handleSearch = async (e) => {
         e.preventDefault();
         if (!query.trim()) return;
+
+        // ... (rest of logic handles playback)
 
         try {
             // Reset
@@ -290,15 +307,32 @@ const SingingPage = ({ mode = 'casual' }) => {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 
-            setEvaluation(res.data.evaluation);
-            setFeedback(res.data.feedback);
-            setViewState('evaluation');
+            // Calculate Score
+            const rawScore = res.data.evaluation.overall_score || 0;
+            const score = Math.floor(rawScore * 10000);
 
-            // Save Score
-            const userName = localStorage.getItem('karaoke_user_name') || 'Anonymous';
-            const score = Math.floor((res.data.evaluation.overall_score || 0) * 10000);
+            // BATTLE MODE LOGIC
+            if (mode === 'competition') {
+                if (currentTurn === 'p1') {
+                    setBattleScores(prev => ({ ...prev, p1: { score, evaluation: res.data.evaluation, feedback: res.data.feedback } }));
+                    setViewState('battle_intermission');
+                } else {
+                    setBattleScores(prev => ({ ...prev, p2: { score, evaluation: res.data.evaluation, feedback: res.data.feedback } }));
+                    setViewState('battle_reveal');
+                }
+            } else {
+                // CASUAL MODE (Existing Logic)
+                setEvaluation(res.data.evaluation);
+                setFeedback(res.data.feedback);
+                setViewState('evaluation');
+            }
 
-            // Only save if score > 0
+            // Save Score to Leaderboard (Always separate entries for history)
+            // Use battle names if in battle mode
+            const userName = mode === 'competition'
+                ? (currentTurn === 'p1' ? battlePlayers.p1 : battlePlayers.p2)
+                : (localStorage.getItem('karaoke_user_name') || 'Anonymous');
+
             if (score > 0) {
                 await axios.post('/api/save_score', {
                     user_name: userName,
@@ -319,6 +353,110 @@ const SingingPage = ({ mode = 'casual' }) => {
 
     const handleVideoEnded = () => {
         finishSong();
+    }
+
+    // Start Player 2 Turn
+    const startP2Turn = () => {
+        setCurrentTurn('p2');
+        setOffset(0); // Reset offset? Maybe keep it if P1 tuned it? Let's reset for fairness or allow tuning again.
+        // Restart video
+        if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+            videoRef.current.play();
+            setIsPlaying(true);
+        }
+        setViewState('playing');
+    };
+
+    if (viewState === 'battle_intermission') {
+        return (
+            <div className="intermission-container">
+                <h1 className="text-glow-cyan">{battlePlayers.p1} FINISHED!</h1>
+                <p>Score Hidden 🤫</p>
+                <div className="vs-badge large">VS</div>
+                <h2 className="text-glow-magenta">Ready {battlePlayers.p2}?</h2>
+                <p>Sing "{songData?.title}" to win!</p>
+                <button className="battle-start-btn" onClick={startP2Turn}>
+                    START ROUND 2 🎤
+                </button>
+            </div>
+        );
+    }
+
+    if (viewState === 'battle_reveal') {
+        const p1Score = battleScores.p1?.score || 0;
+        const p2Score = battleScores.p2?.score || 0;
+        const winner = p1Score > p2Score ? battlePlayers.p1 : battlePlayers.p2;
+        const isDraw = p1Score === p2Score;
+
+        return (
+            <div className="reveal-container">
+                <h1 className="title-huge text-glow-gold">🏆 WINNER 🏆</h1>
+
+                <div className="winner-display">
+                    <div className={`winner-avatar ${p1Score > p2Score ? 'p1-win' : 'p2-win'}`}>
+                        {isDraw ? "IT'S A DRAW!" : winner}
+                    </div>
+                </div>
+
+                <div className="score-comparison box-glow">
+                    <div className="p-score">
+                        <h3>{battlePlayers.p1}</h3>
+                        <span className="score-val">{p1Score.toLocaleString()}</span>
+                        <div className="stats-breakdown">
+                            <div className="stat-row"><span>🎤 Pitch:</span> {Math.floor((battleScores.p1?.evaluation?.pitch_accuracy_score || 0) * 100)}%</div>
+                            <div className="stat-row"><span>🥁 Rhythm:</span> {Math.floor((battleScores.p1?.evaluation?.rhythm_score || 0) * 100)}%</div>
+                            <div className="stat-row"><span>📜 Lyrics:</span> {Math.floor((battleScores.p1?.evaluation?.lyrics_score || 0) * 100)}%</div>
+                        </div>
+                    </div>
+                    <div className="vs-divider">VS</div>
+                    <div className="p-score">
+                        <h3>{battlePlayers.p2}</h3>
+                        <span className="score-val">{p2Score.toLocaleString()}</span>
+                        <div className="stats-breakdown">
+                            <div className="stat-row"><span>🎤 Pitch:</span> {Math.floor((battleScores.p2?.evaluation?.pitch_accuracy_score || 0) * 100)}%</div>
+                            <div className="stat-row"><span>🥁 Rhythm:</span> {Math.floor((battleScores.p2?.evaluation?.rhythm_score || 0) * 100)}%</div>
+                            <div className="stat-row"><span>📜 Lyrics:</span> {Math.floor((battleScores.p2?.evaluation?.lyrics_score || 0) * 100)}%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button className="retry-btn" onClick={() => window.location.reload()}>
+                    NEW BATTLE
+                </button>
+            </div>
+        );
+    }
+    if (viewState === 'battle_setup') {
+        return (
+            <div className="battle-setup-container">
+                <h1 className="text-glow-magenta title-huge">🎤 1v1 BATTLE 🥊</h1>
+                <div className="battle-form box-glow">
+                    <div className="player-input">
+                        <label>Player 1 (Challenger)</label>
+                        <input
+                            type="text"
+                            placeholder="Enter Name..."
+                            value={battlePlayers.p1}
+                            onChange={e => setBattlePlayers({ ...battlePlayers, p1: e.target.value })}
+                        />
+                    </div>
+                    <div className="vs-badge">VS</div>
+                    <div className="player-input">
+                        <label>Player 2 (Defender)</label>
+                        <input
+                            type="text"
+                            placeholder="Enter Name..."
+                            value={battlePlayers.p2}
+                            onChange={e => setBattlePlayers({ ...battlePlayers, p2: e.target.value })}
+                        />
+                    </div>
+                    <button className="battle-start-btn" onClick={handleStartBattle}>
+                        PICK SONG & FIGHT!
+                    </button>
+                </div>
+            </div>
+        );
     }
 
     if (viewState === 'search') {
