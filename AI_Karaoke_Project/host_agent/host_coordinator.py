@@ -6,6 +6,7 @@ from pydantic import BaseModel
 import requests
 import logging
 import os
+import json
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -92,7 +93,8 @@ async def stop_song():
 async def submit_performance(
     audio_file: UploadFile = File(...),
     personality: str = Form("strict_judge"),
-    reference_lyrics: str = Form(None)
+    reference_lyrics: str = Form(None),
+    offset: float = Form(0.0)
 ):
     """
     Orchestrates the evaluation process:
@@ -108,7 +110,7 @@ async def submit_performance(
         
         # Prepare multipart upload for evaluator
         files = {'audio_file': ('performance.wav', audio_content, 'audio/wav')}
-        data = {}
+        data = {'offset': str(offset)}
         if reference_lyrics:
             data['reference_lyrics'] = reference_lyrics
             
@@ -142,6 +144,59 @@ async def submit_performance(
     except Exception as e:
         logger.error(f"Error processing performance: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# Leaderboard/Profile Logic
+
+LEADERBOARD_FILE = os.path.join(BASE_DIR, "leaderboard.json")
+
+def load_leaderboard():
+    if not os.path.exists(LEADERBOARD_FILE):
+        return {"casual": [], "competition": []}
+    try:
+        with open(LEADERBOARD_FILE, "r") as f:
+            return json.load(f)
+    except Exception:
+        return {"casual": [], "competition": []}
+
+def save_leaderboard(data):
+    with open(LEADERBOARD_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
+@app.get("/api/leaderboard")
+async def get_leaderboard():
+    return load_leaderboard()
+
+@app.post("/api/save_score")
+async def save_score(request: Request):
+    """
+    Saves a score to the leaderboard.
+    Expected JSON: { "user_name": str, "score": int, "mode": "casual"|"competition", "song": str }
+    """
+    data = await request.json()
+    user_name = data.get("user_name", "Anonymous")
+    score = data.get("score", 0)
+    mode = data.get("mode", "casual")
+    song_title = data.get("song", "Unknown Song")
+    
+    leaderboard = load_leaderboard()
+    
+    entry = {
+        "user_name": user_name,
+        "score": score,
+        "song": song_title,
+        "date": "Just now" # You might want to use datetime.now().isoformat()
+    }
+    
+    if mode == "competition":
+        leaderboard["competition"].append(entry)
+        # Sort desc
+        leaderboard["competition"].sort(key=lambda x: x["score"], reverse=True)
+    else:
+        leaderboard["casual"].append(entry)
+        leaderboard["casual"].sort(key=lambda x: x["score"], reverse=True)
+        
+    save_leaderboard(leaderboard)
+    return {"status": "success", "leaderboard": leaderboard}
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,0 +1,119 @@
+.leaderboard-container {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    color: var(--color-gold);
+}
+
+.leaderboard-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: var(--color-gold);
+    text-shadow: 0 0 10px #F0DF8E;
+}
+
+.leaderboard-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tab-btn {
+    background: transparent;
+    border: 1px solid var(--color-cyan);
+    color: var(--color-cyan);
+    padding: 0.8rem 2rem;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.tab-btn.active {
+    background: var(--color-cyan);
+    color: var(--color-bg);
+    box-shadow: 0 0 15px var(--color-cyan);
+}
+
+.tab-btn.competition {
+    border-color: var(--color-magenta);
+    color: var(--color-magenta);
+}
+
+.tab-btn.competition.active {
+    background: var(--color-magenta);
+    color: white;
+    box-shadow: 0 0 15px var(--color-magenta);
+}
+
+.leaderboard-table-container {
+    background: rgba(10, 15, 35, 0.8);
+    border: 1px solid rgba(3, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 1rem;
+    min-height: 400px;
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.leaderboard-table th {
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-cyan);
+    font-weight: 600;
+}
+
+.leaderboard-table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.leaderboard-table tr:last-child td {
+    border-bottom: none;
+}
+
+.singer-cell {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.song-cell {
+    display: flex;
+    align-items: center;
+    color: #ccc;
+}
+
+.score-cell {
+    text-align: right;
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--color-gold);
+}
+
+.top-1 {
+    background: linear-gradient(90deg, rgba(240, 223, 142, 0.1) 0%, transparent 100%);
+}
+
+.rank-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.loading,
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    font-size: 1.2rem;
+    color: #aaa;
+}
