@@ -300,3 +300,11 @@
 2025-12-08 02:47:13,643 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
 2025-12-08 02:47:14,563 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2025-12-08 02:47:14,566 | INFO | Feedback successfully generated: Pitch unstable; however, your rhythm is precise and well-executed. Support your ...
+2025-12-08 02:54:06,569 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 02:54:06,569 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 02:54:08,391 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 02:54:08,401 | INFO | Feedback successfully generated: Pitch unstable; the rhythm lacks precision. Support the high notes....
+2025-12-08 02:59:07,018 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 02:59:07,018 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 02:59:08,620 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 02:59:08,633 | INFO | Feedback successfully generated: Pitch unstable; rhythm lacks precision. Support the high notes....

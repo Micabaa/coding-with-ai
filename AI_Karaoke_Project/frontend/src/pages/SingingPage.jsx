@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Search, Play, Square, Mic, Volume2, Eye, EyeOff, Minus, Plus } from 'lucide-react';
 import './SingingPage.css';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 const SingingPage = ({ mode = 'casual' }) => {
     // States: 'search', 'playing', 'evaluation'
@@ -11,6 +12,7 @@ const SingingPage = ({ mode = 'casual' }) => {
     const [query, setQuery] = useState('');
     const [songData, setSongData] = useState(null);
     const [lyrics, setLyrics] = useState([]);
+    const [isLoadingSong, setIsLoadingSong] = useState(false);
 
     // Playback State
     const [isPlaying, setIsPlaying] = useState(false);
@@ -42,6 +44,7 @@ const SingingPage = ({ mode = 'casual' }) => {
             setVideoUrl('');
 
             // Call Host Agent
+            setIsLoadingSong(true);
             const res = await axios.post('/api/play_song', { query });
             const { audio, lyrics: lyricsData } = res.data;
 
@@ -59,6 +62,8 @@ const SingingPage = ({ mode = 'casual' }) => {
         } catch (err) {
             console.error(err);
             alert("Failed to load song. Please try again.");
+        } finally {
+            setIsLoadingSong(false);
         }
     };
 
@@ -238,6 +243,7 @@ const SingingPage = ({ mode = 'casual' }) => {
     if (viewState === 'search') {
         return (
             <div className="search-container">
+                {isLoadingSong && <LoadingOverlay message="Fetching Song & Lyrics..." />}
                 <h1 className="text-glow-magenta title-huge">Ready to Sing?</h1>
                 <form onSubmit={handleSearch} className="search-box box-glow">
                     <Search className="search-icon" />
@@ -353,7 +359,8 @@ const SingingPage = ({ mode = 'casual' }) => {
 
     return (
         <div className="singing-interface">
-            {isSubmitting && <div className="overlay-loading">Evaluating Performance...</div>}
+            {isLoadingSong && <LoadingOverlay message="Fetching Song & Lyrics..." />}
+            {isSubmitting && <LoadingOverlay message="Analyzing Performance..." />}
 
             <div className="song-header">
                 <h2 className="text-glow-cyan">{songData?.title}</h2>

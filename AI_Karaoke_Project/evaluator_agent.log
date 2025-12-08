@@ -1,63 +1,32 @@
-INFO:     Started server process [42218]
+INFO:     Started server process [47080]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8003 (Press CTRL+C to quit)
-INFO:SingingEvaluator:Analyzing audio file: /var/folders/8t/3vcwxw8d1wl7lbzxzw1zrlh00000gn/T/tmpmrtax63f.wav
+INFO:SingingEvaluator:Analyzing audio file: /var/folders/8t/3vcwxw8d1wl7lbzxzw1zrlh00000gn/T/tmpc2f8d1kk.wav
 /Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:316: UserWarning: PySoundFile failed. Trying audioread instead.
   y, sr = librosa.load(audio_path, sr=None)
 /Users/miabaudri/coding-with-ai/.venv/lib/python3.13/site-packages/librosa/core/audio.py:184: FutureWarning: librosa.core.audio.__audioread_load
 	Deprecated as of librosa version 0.10.0.
 	It will be removed in librosa version 1.0.
   y, sr_native = __audioread_load(path, offset, duration, dtype)
-ERROR:audio_tools.audio_analysis:Error analyzing audio: 
-INFO:SingingEvaluator:Cleaned up temp file: /var/folders/8t/3vcwxw8d1wl7lbzxzw1zrlh00000gn/T/tmpmrtax63f.wav
+INFO:audio_tools.audio_analysis:Audio Duration: 25.31s
+INFO:audio_tools.audio_analysis:Total Reference Lyrics: 33
+INFO:audio_tools.audio_analysis:First Lyric Timestamp: 0.43
+INFO:audio_tools.audio_analysis:Relevant Lyrics Count: 4
+/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:143: UserWarning: PySoundFile failed. Trying audioread instead.
+  y_ref, _ = librosa.load(reference_audio_path, sr=sr_user, duration=60)
+/Users/miabaudri/coding-with-ai/.venv/lib/python3.13/site-packages/librosa/core/audio.py:184: FutureWarning: librosa.core.audio.__audioread_load
+	Deprecated as of librosa version 0.10.0.
+	It will be removed in librosa version 1.0.
+  y, sr_native = __audioread_load(path, offset, duration, dtype)
+INFO:audio_tools.audio_analysis:DTW Analysis: Distance=4908.32, Avg=0.9289 -> Score=0.1560
+/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:248: UserWarning: PySoundFile failed. Trying audioread instead.
+  y_ref, _ = librosa.load(reference_audio_path, sr=sr_user, duration=user_duration + 5)
+/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:33: UserWarning: PySoundFile failed. Trying audioread instead.
+  y, sr = librosa.load(audio_path, sr=None)
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 200 OK"
+INFO:audio_tools.audio_analysis:Transcribed: 'I talk too much, I talk too much' -> Score: 0.2682926829268293
+INFO:audio_tools.audio_analysis:Audio analysis complete: {'overall_score': np.float64(0.4913960326678097), 'pitch_accuracy_score': 0.7200000000000001, 'rhythm_score': np.float64(0.4858954150765995), 'lyrics_score': 0.2682926829268293, 'vocal_power': 'low', 'transcribed_text': 'I talk too much, I talk too much', 'pitch_detail': {'high': 0.1, 'low': 0.16, 'perfect': 0.75}, 'lyrics_diff': [{'word': 'Ha!', 'status': 'missing'}, {'word': 'Golden,', 'status': 'missing'}, {'word': 'golden,', 'status': 'missing'}, {'word': 'golden', 'status': 'missing'}, {'word': 'as', 'status': 'missing'}, {'word': 'I', 'status': 'matched'}, {'word': 'open', 'status': 'missing'}, {'word': 'my', 'status': 'missing'}, {'word': 'eyes', 'status': 'missing'}, {'word': 'Hold', 'status': 'missing'}, {'word': 'it,', 'status': 'missing'}, {'word': 'focus,', 'status': 'missing'}, {'word': 'hoping,', 'status': 'missing'}, {'word': 'take', 'status': 'missing'}, {'word': 'me', 'status': 'missing'}, {'word': 'back', 'status': 'missing'}, {'word': 'to', 'status': 'wrong', 'heard': 'talk'}, {'word': 'the', 'status': 'wrong', 'heard': 'too'}, {'word': 'light', 'status': 'wrong', 'heard': 'much'}, {'word': 'I', 'status': 'matched'}, {'word': 'know', 'status': 'missing'}, {'word': 'you', 'status': 'missing'}, {'word': 'were', 'status': 'missing'}, {'word': 'way', 'status': 'wrong', 'heard': 'talk'}, {'word': 'too', 'status': 'matched'}, {'word': 'bright', 'status': 'missing'}, {'word': 'for', 'status': 'missing'}, {'word': 'me', 'status': 'wrong', 'heard': 'much'}], 'emotion_detected': 'neutral', 'audio_duration': 25.30829931972789, 'average_scores': {'overall': np.float64(0.4913960326678097), 'pitch': 0.7200000000000001, 'rhythm': np.float64(0.4858954150765995), 'lyrics': 0.2682926829268293}}
+INFO:SingingEvaluator:Cleaned up temp file: /var/folders/8t/3vcwxw8d1wl7lbzxzw1zrlh00000gn/T/tmpc2f8d1kk.wav
 🎤 Starting Singing Evaluator Agent FastAPI Server...
-INFO:     127.0.0.1:50088 - "POST /evaluate_singing HTTP/1.1" 200 OK
-INFO:SingingEvaluator:Analyzing audio file: /var/folders/8t/3vcwxw8d1wl7lbzxzw1zrlh00000gn/T/tmppimgid6z.wav
-INFO:audio_tools.audio_analysis:Audio Duration: 41.76s
-INFO:audio_tools.audio_analysis:Total Reference Lyrics: 36
-INFO:audio_tools.audio_analysis:First Lyric Timestamp: 17.83
-INFO:audio_tools.audio_analysis:Relevant Lyrics Count: 7
-/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:143: UserWarning: PySoundFile failed. Trying audioread instead.
-  y_ref, _ = librosa.load(reference_audio_path, sr=sr_user, duration=60)
-/Users/miabaudri/coding-with-ai/.venv/lib/python3.13/site-packages/librosa/core/audio.py:184: FutureWarning: librosa.core.audio.__audioread_load
-	Deprecated as of librosa version 0.10.0.
-	It will be removed in librosa version 1.0.
-  y, sr_native = __audioread_load(path, offset, duration, dtype)
-INFO:audio_tools.audio_analysis:DTW Analysis: Distance=8055.36, Avg=1.1529 -> Score=0.0997
-/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:248: UserWarning: PySoundFile failed. Trying audioread instead.
-  y_ref, _ = librosa.load(reference_audio_path, sr=sr_user, duration=user_duration + 5)
-/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:33: UserWarning: PySoundFile failed. Trying audioread instead.
-  y, sr = librosa.load(audio_path, sr=None)
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 200 OK"
-INFO:audio_tools.audio_analysis:Transcribed: 'Missed You to see without my eyes The first time you said you What's it Was around me Ah breath' -> Score: 0.5182724252491695
-INFO:audio_tools.audio_analysis:Audio analysis complete: {'overall_score': np.float64(0.5395781616232552), 'pitch_accuracy_score': 0.6345, 'rhythm_score': np.float64(0.4659620596205961), 'lyrics_score': 0.5182724252491695, 'vocal_power': 'low', 'transcribed_text': "Missed You to see without my eyes The first time you said you What's it Was around me Ah breath", 'pitch_detail': {'high': 0.17, 'low': 0.21, 'perfect': 0.62}, 'lyrics_diff': [{'word': 'Oh,', 'status': 'wrong', 'heard': 'missed'}, {'word': 'to', 'status': 'matched'}, {'word': 'see', 'status': 'matched'}, {'word': 'without', 'status': 'matched'}, {'word': 'my', 'status': 'matched'}, {'word': 'eyes', 'status': 'matched'}, {'word': 'The', 'status': 'matched'}, {'word': 'first', 'status': 'matched'}, {'word': 'time', 'status': 'matched'}, {'word': 'that', 'status': 'missing'}, {'word': 'you', 'status': 'matched'}, {'word': 'kissed', 'status': 'missing'}, {'word': 'me', 'status': 'missing'}, {'word': 'Boundless', 'status': 'missing'}, {'word': 'by', 'status': 'missing'}, {'word': 'the', 'status': 'missing'}, {'word': 'time', 'status': 'missing'}, {'word': 'I', 'status': 'missing'}, {'word': 'cried', 'status': 'wrong', 'heard': 'said'}, {'word': 'I', 'status': 'wrong', 'heard': 'you'}, {'word': 'built', 'status': 'wrong', 'heard': 'whats'}, {'word': 'your', 'status': 'wrong', 'heard': 'it'}, {'word': 'walls', 'status': 'matched'}, {'word': 'around', 'status': 'matched'}, {'word': 'me', 'status': 'matched'}, {'word': 'White', 'status': 'missing'}, {'word': 'noise,', 'status': 'missing'}, {'word': 'what', 'status': 'missing'}, {'word': 'an', 'status': 'missing'}, {'word': 'awful', 'status': 'missing'}, {'word': 'sound', 'status': 'missing'}, {'word': 'Fumbling', 'status': 'missing'}, {'word': 'by', 'status': 'missing'}, {'word': 'Rogue', 'status': 'missing'}, {'word': 'River', 'status': 'missing'}, {'word': 'Feel', 'status': 'missing'}, {'word': 'my', 'status': 'missing'}, {'word': 'feet', 'status': 'missing'}, {'word': 'above', 'status': 'missing'}, {'word': 'the', 'status': 'wrong', 'heard': 'ah'}, {'word': 'ground', 'status': 'wrong', 'heard': 'breath'}], 'emotion_detected': 'neutral', 'audio_duration': 41.76, 'average_scores': {'overall': np.float64(0.5395781616232552), 'pitch': 0.6345, 'rhythm': np.float64(0.4659620596205961), 'lyrics': 0.5182724252491695}}
-INFO:SingingEvaluator:Cleaned up temp file: /var/folders/8t/3vcwxw8d1wl7lbzxzw1zrlh00000gn/T/tmppimgid6z.wav
-INFO:     127.0.0.1:50459 - "POST /evaluate_singing HTTP/1.1" 200 OK
-INFO:SingingEvaluator:Analyzing audio file: /var/folders/8t/3vcwxw8d1wl7lbzxzw1zrlh00000gn/T/tmpb6h0zmdw.wav
-/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:316: UserWarning: PySoundFile failed. Trying audioread instead.
-  y, sr = librosa.load(audio_path, sr=None)
-/Users/miabaudri/coding-with-ai/.venv/lib/python3.13/site-packages/librosa/core/audio.py:184: FutureWarning: librosa.core.audio.__audioread_load
-	Deprecated as of librosa version 0.10.0.
-	It will be removed in librosa version 1.0.
-  y, sr_native = __audioread_load(path, offset, duration, dtype)
-INFO:audio_tools.audio_analysis:Audio Duration: 75.84s
-INFO:audio_tools.audio_analysis:Total Reference Lyrics: 36
-INFO:audio_tools.audio_analysis:First Lyric Timestamp: 17.83
-INFO:audio_tools.audio_analysis:Relevant Lyrics Count: 12
-/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:143: UserWarning: PySoundFile failed. Trying audioread instead.
-  y_ref, _ = librosa.load(reference_audio_path, sr=sr_user, duration=60)
-/Users/miabaudri/coding-with-ai/.venv/lib/python3.13/site-packages/librosa/core/audio.py:184: FutureWarning: librosa.core.audio.__audioread_load
-	Deprecated as of librosa version 0.10.0.
-	It will be removed in librosa version 1.0.
-  y, sr_native = __audioread_load(path, offset, duration, dtype)
-INFO:audio_tools.audio_analysis:DTW Analysis: Distance=8697.10, Avg=1.1316 -> Score=0.1040
-/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:248: UserWarning: PySoundFile failed. Trying audioread instead.
-  y_ref, _ = librosa.load(reference_audio_path, sr=sr_user, duration=user_duration + 5)
-/Users/miabaudri/coding-with-ai/AI_Karaoke_Project/singing_evaluator_agent/audio_tools/audio_analysis.py:33: UserWarning: PySoundFile failed. Trying audioread instead.
-  y, sr = librosa.load(audio_path, sr=None)
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 200 OK"
-INFO:audio_tools.audio_analysis:Transcribed: 'Oh, oh woe-oh-woah is me The first time that you touched me Boundless by the time I cried I built your walls around me White noise, what an awful sound Fumbling by Rogue River Feel my feet above the ground Hand of God, deliver me Oh, oh woe-oh-woah is me The first time that you touched me Oh, will wonders ever cease? Blessed be the mystery of love' -> Score: 0.949928469241774
-INFO:audio_tools.audio_analysis:Audio analysis complete: {'overall_score': 0.8659761564139247, 'pitch_accuracy_score': 0.648, 'rhythm_score': 1.0, 'lyrics_score': 0.949928469241774, 'vocal_power': 'low', 'transcribed_text': 'Oh, oh woe-oh-woah is me The first time that you touched me Boundless by the time I cried I built your walls around me White noise, what an awful sound Fumbling by Rogue River Feel my feet above the ground Hand of God, deliver me Oh, oh woe-oh-woah is me The first time that you touched me Oh, will wonders ever cease? Blessed be the mystery of love', 'pitch_detail': {'high': 0.12, 'low': 0.22, 'perfect': 0.66}, 'lyrics_diff': [{'word': 'Oh,', 'status': 'matched'}, {'word': 'to', 'status': 'missing'}, {'word': 'see', 'status': 'wrong', 'heard': 'oh'}, {'word': 'without', 'status': 'wrong', 'heard': 'woeohwoah'}, {'word': 'my', 'status': 'wrong', 'heard': 'is'}, {'word': 'eyes', 'status': 'wrong', 'heard': 'me'}, {'word': 'The', 'status': 'matched'}, {'word': 'first', 'status': 'matched'}, {'word': 'time', 'status': 'matched'}, {'word': 'that', 'status': 'matched'}, {'word': 'you', 'status': 'matched'}, {'word': 'kissed', 'status': 'wrong', 'heard': 'touched'}, {'word': 'me', 'status': 'matched'}, {'word': 'Boundless', 'status': 'matched'}, {'word': 'by', 'status': 'matched'}, {'word': 'the', 'status': 'matched'}, {'word': 'time', 'status': 'matched'}, {'word': 'I', 'status': 'matched'}, {'word': 'cried', 'status': 'matched'}, {'word': 'I', 'status': 'matched'}, {'word': 'built', 'status': 'matched'}, {'word': 'your', 'status': 'matched'}, {'word': 'walls', 'status': 'matched'}, {'word': 'around', 'status': 'matched'}, {'word': 'me', 'status': 'matched'}, {'word': 'White', 'status': 'matched'}, {'word': 'noise,', 'status': 'matched'}, {'word': 'what', 'status': 'matched'}, {'word': 'an', 'status': 'matched'}, {'word': 'awful', 'status': 'matched'}, {'word': 'sound', 'status': 'matched'}, {'word': 'Fumbling', 'status': 'matched'}, {'word': 'by', 'status': 'matched'}, {'word': 'Rogue', 'status': 'matched'}, {'word': 'River', 'status': 'matched'}, {'word': 'Feel', 'status': 'matched'}, {'word': 'my', 'status': 'matched'}, {'word': 'feet', 'status': 'matched'}, {'word': 'above', 'status': 'matched'}, {'word': 'the', 'status': 'matched'}, {'word': 'ground', 'status': 'matched'}, {'word': 'Hand', 'status': 'matched'}, {'word': 'of', 'status': 'matched'}, {'word': 'God,', 'status': 'matched'}, {'word': 'deliver', 'status': 'matched'}, {'word': 'me', 'status': 'matched'}, {'word': 'Oh,', 'status': 'matched'}, {'word': 'oh', 'status': 'matched'}, {'word': 'woe-oh-woah', 'status': 'matched'}, {'word': 'is', 'status': 'matched'}, {'word': 'me', 'status': 'matched'}, {'word': 'The', 'status': 'matched'}, {'word': 'first', 'status': 'matched'}, {'word': 'time', 'status': 'matched'}, {'word': 'that', 'status': 'matched'}, {'word': 'you', 'status': 'matched'}, {'word': 'touched', 'status': 'matched'}, {'word': 'me', 'status': 'matched'}, {'word': 'Oh,', 'status': 'matched'}, {'word': 'will', 'status': 'matched'}, {'word': 'wonders', 'status': 'matched'}, {'word': 'ever', 'status': 'matched'}, {'word': 'cease?', 'status': 'matched'}, {'word': 'Blessed', 'status': 'matched'}, {'word': 'be', 'status': 'matched'}, {'word': 'the', 'status': 'matched'}, {'word': 'mystery', 'status': 'matched'}, {'word': 'of', 'status': 'matched'}, {'word': 'love', 'status': 'matched'}], 'emotion_detected': 'neutral', 'audio_duration': 75.84, 'average_scores': {'overall': 0.8659761564139247, 'pitch': 0.648, 'rhythm': 1.0, 'lyrics': 0.949928469241774}}
-INFO:SingingEvaluator:Cleaned up temp file: /var/folders/8t/3vcwxw8d1wl7lbzxzw1zrlh00000gn/T/tmpb6h0zmdw.wav
-INFO:     127.0.0.1:50912 - "POST /evaluate_singing HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51782 - "POST /evaluate_singing HTTP/1.1" 200 OK

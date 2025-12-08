@@ -1,20 +1,8 @@
-INFO:     Started server process [42217]
+INFO:     Started server process [47079]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
-INFO:__main__:Searching syncedlyrics for: suzanne by raye
-INFO:syncedlyrics:Lyrics found for "suzanne by raye" on Musixmatch
+INFO:__main__:Searching syncedlyrics for: golden harry styles
+INFO:syncedlyrics:Lyrics found for "golden harry styles" on Musixmatch
 INFO:__main__:Found synced lyrics!
-INFO:     127.0.0.1:49789 - "GET /search_lyrics?query=suzanne+by+raye HTTP/1.1" 200 OK
-INFO:__main__:Searching syncedlyrics for: mystery of love by sufjan stevens
-INFO:syncedlyrics:Lyrics found for "mystery of love by sufjan stevens" on Lrclib
-INFO:__main__:Found synced lyrics!
-INFO:     127.0.0.1:49840 - "GET /search_lyrics?query=mystery+of+love+by+sufjan+stevens HTTP/1.1" 200 OK
-INFO:__main__:Searching syncedlyrics for: mystery of love by sufjan stevens
-INFO:syncedlyrics:Lyrics found for "mystery of love by sufjan stevens" on Lrclib
-INFO:__main__:Found synced lyrics!
-INFO:     127.0.0.1:50214 - "GET /search_lyrics?query=mystery+of+love+by+sufjan+stevens HTTP/1.1" 200 OK
-INFO:__main__:Searching syncedlyrics for: mystery of love by sufjan stevens
-INFO:syncedlyrics:Lyrics found for "mystery of love by sufjan stevens" on Lrclib
-INFO:__main__:Found synced lyrics!
-INFO:     127.0.0.1:50558 - "GET /search_lyrics?query=mystery+of+love+by+sufjan+stevens HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51710 - "GET /search_lyrics?query=golden+harry+styles HTTP/1.1" 200 OK
