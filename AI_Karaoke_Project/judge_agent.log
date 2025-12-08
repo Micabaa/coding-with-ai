@@ -1,21 +1,12 @@
-INFO:     Started server process [89958]
+INFO:     Started server process [42219]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8004 (Press CTRL+C to quit)
 /Users/miabaudri/coding-with-ai/AI_Karaoke_Project/judge_agent/judge_server.py:93: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
   evaluation_data = request.evaluation_data.dict()
 🎤 Starting Judge Agent FastAPI Server...
-INFO:     127.0.0.1:61761 - "POST /evaluate_performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50095 - "POST /evaluate_performance HTTP/1.1" 200 OK
 /Users/miabaudri/coding-with-ai/AI_Karaoke_Project/judge_agent/judge_server.py:93: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
   evaluation_data = request.evaluation_data.dict()
-INFO:     127.0.0.1:61835 - "POST /evaluate_performance HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61892 - "POST /evaluate_performance HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61983 - "POST /evaluate_performance HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62058 - "POST /evaluate_performance HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62175 - "POST /evaluate_performance HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62239 - "POST /evaluate_performance HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62303 - "POST /evaluate_performance HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62375 - "POST /evaluate_performance HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62482 - "POST /evaluate_performance HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62609 - "POST /evaluate_performance HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62647 - "POST /evaluate_performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50499 - "POST /evaluate_performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50970 - "POST /evaluate_performance HTTP/1.1" 200 OK

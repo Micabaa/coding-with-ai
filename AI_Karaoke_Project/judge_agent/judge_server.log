@@ -236,3 +236,67 @@
 2025-12-08 01:00:40,587 | INFO | Received evaluation for segment=None with personality=strict_judge
 2025-12-08 01:00:42,565 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2025-12-08 01:00:42,569 | INFO | Feedback successfully generated: Pitch unstable; rhythm is lacking precision. Elevate your vocal power....
+2025-12-08 01:30:18,972 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 01:30:18,972 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 01:30:20,676 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 01:30:20,690 | INFO | Feedback successfully generated: Pitch unstable; rhythm significantly off. Improve your timing....
+2025-12-08 01:38:52,309 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 01:38:52,309 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 01:38:54,126 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 01:38:54,139 | INFO | Feedback successfully generated: Pitch unstable and rhythmically inaccurate. Tighten your timing....
+2025-12-08 01:40:45,650 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 01:40:45,651 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 01:40:46,550 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 01:40:46,553 | INFO | Feedback successfully generated: Pitch unstable, with significant rhythm inaccuracies. Focus on tightening your t...
+2025-12-08 01:50:25,162 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 01:50:25,163 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 01:50:25,808 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 01:50:25,820 | INFO | Feedback successfully generated: Pitch unstable; rhythm completely lacking. Support your vocal power and tighten ...
+2025-12-08 01:52:21,790 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 01:52:21,793 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 01:52:22,479 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 01:52:22,481 | INFO | Feedback successfully generated: Pitch unstable; the rhythm is significantly off. Focus on tightening your timing...
+2025-12-08 01:53:34,026 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 01:53:34,028 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 01:53:34,699 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 01:53:34,704 | INFO | Feedback successfully generated: Pitch unstable; your rhythm is solid but lacks the necessary power. Support the ...
+2025-12-08 01:55:29,648 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 01:55:29,650 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 01:55:30,681 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 01:55:30,684 | INFO | Feedback successfully generated: Pitch unstable with significant rhythm inaccuracies. Tighten your timing....
+2025-12-08 01:58:00,742 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 01:58:00,746 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 01:58:01,840 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 01:58:01,843 | INFO | Feedback successfully generated: Pitch unstable and rhythmically inconsistent; your vocal power is also lacking. ...
+2025-12-08 02:01:14,373 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 02:01:14,374 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 02:01:16,488 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 02:01:16,491 | INFO | Feedback successfully generated: Pitch unstable, with significant rhythm issues impacting your overall delivery. ...
+2025-12-08 02:12:33,620 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 02:12:33,620 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 02:12:34,608 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 02:12:34,619 | INFO | Feedback successfully generated: Pitch unstable; rhythm precision is severely lacking. Support your vocal power a...
+2025-12-08 02:20:43,609 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 02:20:43,609 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 02:20:44,398 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 02:20:44,409 | INFO | Feedback successfully generated: Pitch unstable; rhythm completely off. Increase your vocal power and tighten you...
+2025-12-08 02:25:21,640 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 02:25:21,640 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 02:25:22,552 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 02:25:22,564 | INFO | Feedback successfully generated: Pitch unstable; rhythm is severely off. Increase your vocal power and tighten yo...
+2025-12-08 02:38:12,788 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 02:38:12,788 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 02:38:14,414 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 02:38:14,427 | INFO | Feedback successfully generated: Pitch unstable, with significant rhythm issues. Improve your timing precision....
+2025-12-08 02:43:58,333 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 02:43:58,334 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 02:43:59,703 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 02:43:59,712 | INFO | Feedback successfully generated: Pitch unstable; rhythm lacking precision. Focus on stabilizing your pitch and ti...
+2025-12-08 02:45:27,612 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 02:45:27,613 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 02:45:28,439 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 02:45:28,442 | INFO | Feedback successfully generated: Pitch unstable, with significant issues in rhythm precision. Support your vocal ...
+2025-12-08 02:47:13,641 | INFO | Received evaluation for segment=None with personality=friendly
+2025-12-08 02:47:13,643 | WARNING | Prompt friendly_detail.txt not found, falling back to strict_judge_detail.txt
+2025-12-08 02:47:14,563 | INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 02:47:14,566 | INFO | Feedback successfully generated: Pitch unstable; however, your rhythm is precise and well-executed. Support your ...

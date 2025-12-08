@@ -78,61 +78,52 @@ def calculate_timing_score(y, sr, reference_lyrics):
         return 0.0
 
     # 1. Detect Voice Activity (VAD)
-    # Lower top_db to catch quieter singing
-    intervals = librosa.effects.split(y, top_db=15)
+    intervals = librosa.effects.split(y, top_db=20)
     singing_intervals = librosa.samples_to_time(intervals, sr=sr)
     
     # 2. Calculate Overlap
     total_overlap_duration = 0.0
     total_lyric_duration = 0.0
     
-    # Sort lyrics by timestamp just in case
-    # Handle 'timestamp' vs 'start_time' mismatch
     sorted_lyrics = sorted(reference_lyrics, key=lambda x: x.get('timestamp', x.get('start_time', 0)))
     
     for i, lyric in enumerate(sorted_lyrics):
-        # Support both 'timestamp' (from lyrics_server) and 'start_time'
         start = float(lyric.get('timestamp', lyric.get('start_time', 0)))
         
-        # Infer end time from next line or default duration
+        # Infer end time
         if i < len(sorted_lyrics) - 1:
             next_start = float(sorted_lyrics[i+1].get('timestamp', sorted_lyrics[i+1].get('start_time', 0)))
             time_gap = next_start - start
         else:
-            time_gap = 5.0 # Default buffer
+            time_gap = 5.0
             
-        # Estimate expected singing duration based on word count
-        # Typical singing speed: 0.4s - 0.6s per word.
         words = lyric.get('text', '').split()
         num_words = len(words) if words else 1
-        estimated_duration = num_words * 0.6 # Generous 0.6s per word
-        
-        # The 'target' duration is the lesser of the Time Gap (if lines overlap fast) or Estimated Duration
-        # This effectively ignores the empty space (silence) at the end of a line.
+        estimated_duration = num_words * 0.6 
         target_duration = min(time_gap, estimated_duration)
-        
-        # Don't let target be zero
         target_duration = max(0.5, target_duration)
             
         total_lyric_duration += target_duration
         
-        # Check overlap within the FULL time gap (we allow user to sing anywhere in the gap)
-        # But we only expect them to fill 'target_duration' amount of it.
-        # Define the window to check
-        window_end = start + time_gap
+        # Window: allow slightly early start (-1.5s)
+        window_start = start - 1.5 
+        window_end = start + max(time_gap, target_duration) + 1.0 # Buffer
         
+        overlap_found = 0.0
         for sing_start, sing_end in singing_intervals:
-            overlap_start = max(start, sing_start)
-            overlap_end = min(window_end, sing_end)
+             # Check overlap
+            o_start = max(window_start, sing_start)
+            o_end = min(window_end, sing_end)
             
-            if overlap_end > overlap_start:
-                total_overlap_duration += (overlap_end - overlap_start)
+            if o_end > o_start:
+                overlap_found += (o_end - o_start)
+                
+        # Cap overlap
+        total_overlap_duration += min(overlap_found, target_duration * 1.5)
     
     if total_lyric_duration > 0:
-        # Cap score at 1.0 (if they sing longer than expected, that's fine/enthusiasm)
         score = min(1.0, total_overlap_duration / total_lyric_duration)
-        # Boost it slightly to be more encouraging
-        score = min(1.0, score * 1.2)
+        if score > 0.1: score = min(1.0, score + 0.1)
     else:
         score = 0.0
         

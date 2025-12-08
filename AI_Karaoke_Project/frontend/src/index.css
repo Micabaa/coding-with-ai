@@ -1,0 +1,63 @@
+:root {
+  --color-gold: #F0DF8E;
+  --color-bg: #0A0F23;
+  /* Dark Navy */
+  --color-cyan: #03FFFF;
+  --color-magenta: #FF00FF;
+
+  --font-main: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg);
+  color: var(--color-gold);
+  font-family: var(--font-main);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Neon Glow Utilities */
+.text-glow-cyan {
+  text-shadow: 0 0 5px var(--color-cyan), 0 0 10px var(--color-cyan);
+}
+
+.text-glow-magenta {
+  text-shadow: 0 0 5px var(--color-magenta), 0 0 10px var(--color-magenta);
+}
+
+.box-glow {
+  box-shadow: 0 0 10px var(--color-cyan), inset 0 0 5px var(--color-cyan);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-magenta);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-cyan);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

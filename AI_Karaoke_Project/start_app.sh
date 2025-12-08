@@ -34,8 +34,8 @@ fi
 
 # Function to kill processes on specific ports
 cleanup_ports() {
-    echo "🧹 Cleaning up ports 8000-8004..."
-    for PORT in {8000..8004}; do
+    echo "🧹 Cleaning up ports 8000-8004 and 5173-5174..."
+    for PORT in {8000..8004} 5173 5174; do
         # Find all PIDs using the port
         PIDS=$(lsof -ti:$PORT)
         if [ ! -z "$PIDS" ]; then
@@ -49,7 +49,7 @@ cleanup_ports() {
     sleep 2
     
     # Verify ports are free
-    for PORT in {8000..8004}; do
+    for PORT in {8000..8004} 5173 5174; do
         if lsof -i:$PORT >/dev/null; then
             echo "❌ Port $PORT is still in use. Retrying cleanup..."
             PIDS=$(lsof -ti:$PORT)
@@ -81,11 +81,17 @@ echo "🚀 Starting Judge Agent (Port 8004)..."
 python3 judge_agent/judge_server.py > judge_agent.log 2>&1 &
 JUDGE_PID=$!
 
+echo "🚀 Starting Frontend..."
+cd frontend
+npm run dev > ../frontend.log 2>&1 &
+FRONTEND_PID=$!
+cd ..
+
 echo "🚀 Starting Host Agent (Port 8000)..."
 echo "   Access the application at http://localhost:8000"
 
 # Trap to kill background processes on exit
-trap "kill $AUDIO_PID $LYRICS_PID $EVAL_PID $JUDGE_PID" EXIT
+trap "kill $AUDIO_PID $LYRICS_PID $EVAL_PID $JUDGE_PID $FRONTEND_PID" EXIT
 
 python3 host_agent/host_coordinator.py
 
