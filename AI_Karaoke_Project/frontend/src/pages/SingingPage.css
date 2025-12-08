@@ -534,3 +534,189 @@
 .diff-extra {
     color: var(--color-cyan);
 }
+
+/* Battle Mode Styles */
+
+.battle-setup-container,
+.intermission-container,
+.reveal-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    /* Allow it to grow */
+    padding: 3rem 0;
+    /* Add vertical breathing room */
+    animation: fadeIn 0.8s ease;
+    gap: 2rem;
+}
+
+.battle-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 3rem;
+    min-width: 400px;
+}
+
+.player-input {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.player-input label {
+    font-size: 1.2rem;
+    color: var(--color-gold);
+    font-weight: bold;
+}
+
+.player-input input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.player-input input:focus {
+    border-color: var(--color-cyan);
+    outline: none;
+    box-shadow: 0 0 10px var(--color-cyan);
+}
+
+.vs-badge {
+    align-self: center;
+    background: linear-gradient(135deg, red, darkred);
+    color: white;
+    font-weight: 900;
+    font-size: 1.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+}
+
+.vs-badge.large {
+    font-size: 3rem;
+    padding: 1.5rem;
+}
+
+.battle-start-btn {
+    background: linear-gradient(90deg, var(--color-magenta), var(--color-cyan));
+    color: white;
+    font-weight: bold;
+    padding: 1.2rem;
+    border-radius: 50px;
+    font-size: 1.3rem;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.battle-start-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px var(--color-magenta);
+}
+
+/* Reveal Screen */
+.winner-display {
+    margin: 2rem 0;
+    animation: popIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.winner-avatar {
+    font-size: 4rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    padding: 2rem 4rem;
+    border-radius: 20px;
+    border: 5px solid white;
+    box-shadow: 0 0 50px white;
+    color: white;
+    text-shadow: 0 0 10px black;
+}
+
+.winner-avatar.p1-win {
+    background: linear-gradient(135deg, gold, orange);
+    box-shadow: 0 0 50px gold;
+    border-color: gold;
+}
+
+.winner-avatar.p2-win {
+    background: linear-gradient(135deg, var(--color-magenta), purple);
+    box-shadow: 0 0 50px var(--color-magenta);
+    border-color: var(--color-magenta);
+}
+
+.score-comparison {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    padding: 2rem 4rem;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.p-score {
+    text-align: center;
+}
+
+.p-score h3 {
+    margin-bottom: 0.5rem;
+    color: #ccc;
+    font-size: 1.2rem;
+}
+
+.score-val {
+    font-family: 'Courier New', monospace;
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+}
+
+
+.stats-breakdown {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+    font-size: 0.9rem;
+    color: #aaa;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.8rem;
+    border-radius: 10px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    width: 150px;
+}
+
+.stat-row span {
+    font-weight: bold;
+    color: var(--color-cyan);
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    80% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

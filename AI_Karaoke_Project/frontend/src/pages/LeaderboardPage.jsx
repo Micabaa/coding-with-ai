@@ -70,13 +70,19 @@ const LeaderboardPage = () => {
                             {currentList.map((entry, index) => (
                                 <tr key={index} className={index < 3 ? `top-${index + 1}` : ''}>
                                     <td className="rank-cell">
-                                        {index === 0 && <Star size={16} fill="gold" color="gold" />}
-                                        {index + 1}
+                                        {/* KORREKTUR 1: Wrapper für Rank-Zentrierung */}
+                                        <span className="rank-content">
+                                            {index === 0 && <Star size={16} fill="gold" color="gold" />}
+                                            {index + 1}
+                                        </span>
                                     </td>
                                     <td className="singer-cell">{entry.user_name}</td>
                                     <td className="song-cell">
-                                        <Music size={14} style={{ marginRight: 8 }} />
-                                        {entry.song}
+                                        {/* KORREKTUR 2: Wrapper für Song-Ausrichtung */}
+                                        <span className="song-content">
+                                            <Music size={14} style={{ marginRight: 8 }} />
+                                            {entry.song}
+                                        </span>
                                     </td>
                                     <td className="score-cell">{entry.score.toLocaleString()}</td>
                                     <td className="date-cell">
