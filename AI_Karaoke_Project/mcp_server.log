@@ -1,21 +1,22 @@
 🎤 Starting AI Karaoke Agentic Host (MCP)...
-🧹 Cleaning up ports 8000-8004...
+🧹 Cleaning up ports 8000-8004 and 5173-5174...
    Waiting for ports to be released...
-/Users/anmyb/Programming/coding-with-ai/AI_Karaoke_Project/host_agent/agentic_host.py:215: DeprecationWarning: 
+🚀 Starting Frontend...
+/Users/anmyb/Programming/coding-with-ai/AI_Karaoke_Project/host_agent/agentic_host.py:240: DeprecationWarning: 
         on_event is deprecated, use lifespan event handlers instead.
 
         Read more about it in the
         [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
         
   @app.on_event("startup")
-/Users/anmyb/Programming/coding-with-ai/AI_Karaoke_Project/host_agent/agentic_host.py:222: DeprecationWarning: 
+/Users/anmyb/Programming/coding-with-ai/AI_Karaoke_Project/host_agent/agentic_host.py:247: DeprecationWarning: 
         on_event is deprecated, use lifespan event handlers instead.
 
         Read more about it in the
         [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
         
   @app.on_event("shutdown")
-INFO:     Started server process [57023]
+INFO:     Started server process [6794]
 INFO:     Waiting for application startup.
 INFO:mcp.server.lowlevel.server:Processing request of type ListToolsRequest
 INFO:AgenticHost:Connected to lyrics MCP Server. Found tools: ['search_lyrics']
@@ -28,4 +29,17 @@ INFO:AgenticHost:Connected to judge MCP Server. Found tools: ['evaluate_performa
 INFO:AgenticHost:Agentic Host started and connected.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-./start_mcp.sh: line 52: 57023 Killed: 9               python3 host_agent/agentic_host.py
+INFO:AgenticHost:MCP Host received play request for: breeze jermango dreaming
+INFO:mcp.server.lowlevel.server:Processing request of type CallToolRequest
+INFO:AudioPlaybackMCP:Searching for: breeze jermango dreaming karaoke
+INFO:AudioPlaybackMCP:Downloading video: Jermango Dreaming - Breeze [Karaoke version]
+INFO:mcp.server.lowlevel.server:Processing request of type CallToolRequest
+INFO:LyricsMCP:Searching syncedlyrics for: breeze jermango dreaming
+INFO:syncedlyrics:Lyrics found for "breeze jermango dreaming" on Musixmatch
+INFO:LyricsMCP:Found synced lyrics!
+INFO:     127.0.0.1:56268 - "POST /api/play_song HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56284 - "GET /songs/VmB_6LwHJ9U.mp4 HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:56342 - "GET /api/leaderboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56345 - "GET /api/leaderboard HTTP/1.1" 200 OK
+./start_mcp.sh: line 65:  6794 Killed: 9               python3 host_agent/agentic_host.py
+Frontend stopped.
