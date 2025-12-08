@@ -1,0 +1,57 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: rgba(10, 15, 35, 0.95);
+    border-bottom: 1px solid var(--color-cyan);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.navbar-logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-magenta);
+    letter-spacing: 2px;
+}
+
+.navbar-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-gold);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.nav-item:hover {
+    color: var(--color-cyan);
+    background: rgba(3, 255, 255, 0.1);
+}
+
+.nav-item.active {
+    color: var(--color-bg);
+    background: var(--color-cyan);
+    box-shadow: 0 0 10px var(--color-cyan);
+}
+
+.nav-item.competition.active {
+    background: var(--color-magenta);
+    box-shadow: 0 0 10px var(--color-magenta);
+}
+
+.navbar-profile {
+    margin-left: 2rem;
+}
