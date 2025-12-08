@@ -542,3 +542,106 @@ async function fetchLyrics(query) {
         lyricsDiv.innerHTML = '<p class="placeholder">Lyrics failed to load.</p>';
     }
 }
+
+
+// --- Personality Management ---
+
+async function loadPersonalities() {
+    try {
+        const response = await fetch('/api/personalities');
+        const data = await response.json();
+        const select = document.getElementById('personality-select');
+
+        // Keep current selection if possible
+        const currentVal = select.value;
+
+        // Clear existing options except defaults if you want, or just rebuild
+        select.innerHTML = '';
+
+        data.personalities.forEach(p => {
+            const option = document.createElement('option');
+            option.value = p;
+            // Capitalize first letter
+            option.text = p.charAt(0).toUpperCase() + p.slice(1).replace(/_/g, ' ');
+            select.appendChild(option);
+        });
+
+        if (currentVal && data.personalities.includes(currentVal)) {
+            select.value = currentVal;
+        }
+    } catch (e) {
+        console.error("Failed to load personalities:", e);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadPersonalities();
+
+    // Toggle Form
+    const toggleBtn = document.getElementById('toggle-create-persona');
+    const form = document.getElementById('create-persona-form');
+    if (toggleBtn && form) {
+        toggleBtn.addEventListener('click', () => {
+            form.classList.toggle('hidden');
+        });
+    }
+
+    // Create Persona
+    const createBtn = document.getElementById('btn-create-persona');
+    if (createBtn) {
+        createBtn.addEventListener('click', async () => {
+            const nameInput = document.getElementById('new-persona-name');
+            const descInput = document.getElementById('new-persona-desc');
+            const status = document.getElementById('create-persona-status');
+
+            const name = nameInput.value.trim().toLowerCase().replace(/\s+/g, '_');
+            const description = descInput.value.trim();
+
+            if (!name || !description) {
+                status.innerText = "Please fill in both fields.";
+                status.style.color = "red";
+                return;
+            }
+
+            status.innerText = "Generating prompt... (this takes ~5s)";
+            status.style.color = "yellow";
+            createBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/create_persona', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    status.innerText = "Success! Created " + name;
+                    status.style.color = "lightgreen";
+
+                    // Refresh list and select new one
+                    await loadPersonalities();
+                    document.getElementById('personality-select').value = name;
+
+                    // Clear inputs
+                    nameInput.value = '';
+                    descInput.value = '';
+
+                    setTimeout(() => {
+                        form.classList.add('hidden');
+                        status.innerText = '';
+                        createBtn.disabled = false;
+                    }, 2000);
+                } else {
+                    status.innerText = "Error: " + (result.error || "Unknown");
+                    status.style.color = "red";
+                    createBtn.disabled = false;
+                }
+            } catch (e) {
+                status.innerText = "Network Error";
+                createBtn.disabled = false;
+            }
+        });
+    }
+});

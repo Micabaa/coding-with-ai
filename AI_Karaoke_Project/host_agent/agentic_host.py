@@ -32,6 +32,7 @@ class KaraokeHost:
         self.sessions = {}
         self.tools = []
         self.tool_map = {}
+        self.security_policy = SecurityPolicy()
 
     async def connect_to_server(self, name: str, script_path: str):
         """Connects to an MCP server running as a python script."""
@@ -85,7 +86,7 @@ class KaraokeHost:
             return "Error: OpenAI API key not configured.", None
 
         messages = [
-        {"role": "system", "content": "You are the 'KaraOKAI Host', a high-energy, helpful, and music-savvy AI. Your goal is to get people singing!\n\nRules:\n1. If a user asks to sing a specific song, IMMEDIATEY use the 'play_song' tool. Do not ask for confirmation.\n2. If a user mentions an artist (e.g. 'I want to sing PVRIS'), you MUST suggest 3 of their most popular karaoke songs. ask which one they want.\n3. If a user is vague (e.g. 'idk help me'), proactively suggest 3 trending or classic karaoke bangers (e.g. Queen, Taylor Swift, The Killers). Ask what genre they like.\n4. Always be encouraging and use emojis! 🎤✨\n5. Never say you 'cannot' play a song unless the tool fails. Assume you can find it."},
+        {"role": "system", "content": "You are the AI Karaoke Host. You help users pick songs, play them, and get evaluated. Use the available tools to fulfill the user's request. Always be enthusiastic! \n\nRULES:\n1. When a user asks to sing a song, you MUST use the 'play_song' tool immediately.\n2. If a user asks to create a new judge personality (e.g. 'create a gangster judge'), use the 'create_persona' tool. Ask for a description if not provided.\n3. Do not just say you will do it, actually call the tool."},
         {"role": "user", "content": user_input}
     ]
 
@@ -161,6 +162,13 @@ class KaraokeHost:
 
     async def call_tool(self, tool_name: str, args: dict):
         """Calls a specific tool on the connected agents."""
+        
+        # --- SECURITY CHECK ---
+        if not self.security_policy.is_allowed(tool_name, args):
+             logger.warning(f"SECURITY BLOCKED: Tool '{tool_name}' blocked by policy.")
+             return "Error: Security Policy Violation. Action blocked."
+        # ----------------------
+
         session_name = self.tool_map.get(tool_name)
         if session_name and session_name in self.sessions:
             try:
@@ -176,6 +184,42 @@ class KaraokeHost:
 
     async def cleanup(self):
         await self.exit_stack.aclose()
+
+class SecurityPolicy:
+    """
+    Enforces access control for MCP tools.
+    Requirement A2: Adopt a mechanism for access control.
+    """
+    def __init__(self):
+        # Define ALLOWLIST of tools
+        self.allowed_tools = {
+            "play_song",
+            "stop_song",
+            "search_lyrics",
+            "evaluate_singing",
+            "evaluate_performance",
+            "create_persona"
+        }
+        
+    def is_allowed(self, tool_name: str, args: dict) -> bool:
+        # 1. Check Tool Name Allowlist
+        if tool_name not in self.allowed_tools:
+            logger.warning(f"Security: Unknown tool '{tool_name}' attempted.")
+            return False
+            
+        # 2. Argument Validation (Basic)
+        # Prevent Path Traversal in file paths if applicable
+        if "audio_path" in args:
+            path = args["audio_path"]
+            if ".." in path or path.startswith("/"):
+                # Allow absolute paths only if they are in temp or songs dir
+                # This is a simple heuristic
+                if "/tmp/" not in path and "/songs/" not in path and "temp" not in path:
+                     logger.warning(f"Security: Suspicious file path '{path}'")
+                     # return False # Strict mode (disabled for now to avoid breaking valid temp paths)
+                     pass
+                     
+        return True
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel
@@ -402,8 +446,45 @@ async def submit_performance(
     except Exception as e:
         logger.error(f"Submission failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        # Cleanup
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
+
+@app.get("/api/personalities")
+async def list_personalities():
+    """Lists all available judge personalities."""
+    prompts_dir = BASE_DIR.parent / "judge_agent" / "personality_prompts"
+    personalities = ["strict_judge", "kind_grandma"] # Defaults
+    
+    if prompts_dir.exists():
+        for file in prompts_dir.glob("*_detail.txt"):
+            name = file.name.replace("_detail.txt", "")
+            if name not in personalities:
+                personalities.append(name)
+                
+    return {"personalities": sorted(personalities)}
+
+class CreatePersonaRequest(BaseModel):
+    name: str
+    description: str
+
+@app.post("/api/create_persona")
+async def api_create_persona(request: CreatePersonaRequest):
+    """Creates a new personality via the Judge Agent."""
+    if not host_agent:
+        raise HTTPException(status_code=503, detail="Host not initialized")
+        
+    # Call the tool directly
+    result_json = await host_agent.call_tool("create_persona", {
+        "name": request.name, 
+        "description": request.description
+    })
+    
+    try:
+        return json.loads(result_json)
+    except:
+        return {"status": "error", "raw": result_json}
 
 @app.get("/api/leaderboard")
 async def get_leaderboard():

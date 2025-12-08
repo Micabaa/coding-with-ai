@@ -12,6 +12,39 @@
     <div class="container">
         <h1>🎤 AI Karaoke Host</h1>
 
+        <!-- Personality Settings -->
+        <div class="settings-container"
+            style="margin-bottom: 20px; padding: 15px; background: #2d3436; border-radius: 8px; color: white;">
+            <label style="font-weight: bold; display: block; margin-bottom: 5px;">Choose Your Judge:</label>
+            <select id="personality-select"
+                class="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:outline-none focus:border-purple-500"
+                style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 4px; color: black;">
+                <option value="strict_judge">Strict Judge 👨‍⚖️</option>
+                <option value="kind_grandma">Supportive Grandma 👵</option>
+            </select>
+
+            <!-- Create New Personality UI -->
+            <div class="mt-2">
+                <button id="toggle-create-persona"
+                    style="background: none; border: none; color: #a29bfe; text-decoration: underline; cursor: pointer; font-size: 0.9em;">
+                    + Create New Personality
+                </button>
+                <div id="create-persona-form" class="hidden"
+                    style="display: none; margin-top: 10px; padding: 10px; background: #636e72; border-radius: 4px;">
+                    <input type="text" id="new-persona-name" placeholder="Name (e.g. gangster)"
+                        style="width: 100%; padding: 5px; margin-bottom: 5px; border-radius: 3px; border: none;">
+                    <textarea id="new-persona-desc" placeholder="Description (e.g. Talks like a 1920s mobster...)"
+                        style="width: 100%; padding: 5px; margin-bottom: 5px; border-radius: 3px; border: none;"
+                        rows="2"></textarea>
+                    <button id="btn-create-persona"
+                        style="width: 100%; padding: 5px; background: #6c5ce7; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold;">
+                        Generate AI Persona
+                    </button>
+                    <p id="create-persona-status" style="font-size: 0.8em; color: #dfe6e9; margin-top: 5px;"></p>
+                </div>
+            </div>
+        </div>
+
         <!-- Chat Interface -->
         <div class="chat-container"
             style="margin-bottom: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 8px; background: #fff;">
@@ -38,12 +71,7 @@
         <div class="controls" style="opacity: 0.5; pointer-events: none; display: none;">
             <!-- Hidden/Disabled manual controls for now -->
             <input type="text" id="song-query" placeholder="Enter song name..." />
-            <select id="personality-select" style="padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
-                <option value="strict_judge">Strict Judge</option>
-                <option value="supportive_grandma">Supportive Grandma</option>
-                <option value="lazy_critic">Lazy Critic</option>
-                <option value="overly_enthusiastic">Overly Enthusiastic</option>
-            </select>
+
             <button id="play-btn">Play</button>
             <button id="stop-btn">Stop</button>
         </div>
