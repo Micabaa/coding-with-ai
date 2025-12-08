@@ -85,9 +85,9 @@ class KaraokeHost:
             return "Error: OpenAI API key not configured.", None
 
         messages = [
-            {"role": "system", "content": "You are the AI Karaoke Host. You help users pick songs, play them, and get evaluated. Use the available tools to fulfill the user's request. Always be enthusiastic! When a user asks to sing a song, you MUST use the 'play_song' tool immediately to find and play it. Do not just say you will do it, actually call the tool."},
-            {"role": "user", "content": user_input}
-        ]
+        {"role": "system", "content": "You are the 'KaraOKAI Host', a high-energy, helpful, and music-savvy AI. Your goal is to get people singing!\n\nRules:\n1. If a user asks to sing a specific song, IMMEDIATEY use the 'play_song' tool. Do not ask for confirmation.\n2. If a user mentions an artist (e.g. 'I want to sing PVRIS'), you MUST suggest 3 of their most popular karaoke songs. ask which one they want.\n3. If a user is vague (e.g. 'idk help me'), proactively suggest 3 trending or classic karaoke bangers (e.g. Queen, Taylor Swift, The Killers). Ask what genre they like.\n4. Always be encouraging and use emojis! 🎤✨\n5. Never say you 'cannot' play a song unless the tool fails. Assume you can find it."},
+        {"role": "user", "content": user_input}
+    ]
 
         # 1. Call LLM with tools
         response = await self.client.chat.completions.create(
@@ -209,6 +209,31 @@ class ChatResponse(BaseModel):
     response: str
     action: Optional[dict] = None
 
+class SongRequest(BaseModel):
+    query: str
+
+class ScoreRequest(BaseModel):
+    user_name: str
+    score: int
+    mode: str
+    song: str
+
+# LEADERBOARD PERSISTENCE
+LEADERBOARD_FILE = BASE_DIR / "leaderboard.json"
+
+def load_leaderboard():
+    if not LEADERBOARD_FILE.exists():
+        return {"casual": [], "competition": []}
+    try:
+        with open(LEADERBOARD_FILE, "r") as f:
+            return json.load(f)
+    except Exception:
+        return {"casual": [], "competition": []}
+
+def save_leaderboard(data):
+    with open(LEADERBOARD_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
 # Global Host Instance
 host_agent = None
 
@@ -256,6 +281,61 @@ async def get_lyrics(query: str):
     except json.JSONDecodeError:
         return {"error": "Invalid JSON from lyrics agent", "raw": result_json}
 
+@app.post("/api/chat")
+async def chat_endpoint(request: ChatRequest):
+    """
+    Endpoint for the frontend chatbot to talk to the Agentic Host.
+    """
+    if not host_agent:
+        raise HTTPException(status_code=503, detail="Host not initialized")
+
+    response_text, action = await host_agent.process_user_input_with_actions(request.message)
+    return {
+        "response": response_text,
+        "action": action
+    }
+
+@app.post("/api/play_song")
+async def play_song(request: SongRequest):
+    if not host_agent:
+        raise HTTPException(status_code=503, detail="Host not initialized")
+    
+    query = request.query
+    logger.info(f"MCP Host received play request for: {query}")
+
+    try:
+        # 1. Call Audio Agent via MCP
+        # Ensure tool name matches what audio mcp server exposes: 'play_song'
+        # The logs showed available tools: ['play_song', 'stop_song']
+        audio_result_str = await host_agent.call_tool("play_song", {"query": query})
+        if not audio_result_str:
+             raise HTTPException(status_code=500, detail="Audio agent returned no data")
+        
+        try:
+             audio_data = json.loads(audio_result_str)
+        except json.JSONDecodeError:
+             # Fallback if it returns raw string url or something (unlikely if consistent)
+             audio_data = {"url": audio_result_str, "track": query, "status": "unknown"}
+
+        # 2. Call Lyrics Agent via MCP
+        lyrics_result_str = await host_agent.call_tool("search_lyrics", {"query": query})
+        lyrics_data = {}
+        if lyrics_result_str:
+            try:
+                lyrics_data = json.loads(lyrics_result_str)
+            except json.JSONDecodeError:
+                lyrics_data = {"lyrics": [], "error": "Invalid lyrics json"}
+
+        return {
+            "status": "success",
+            "audio": audio_data,
+            "lyrics": lyrics_data
+        }
+
+    except Exception as e:
+        logger.error(f"Error in play_song: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/stop_song")
 async def stop_song():
     if not host_agent:
@@ -270,7 +350,8 @@ async def submit_performance(
     audio_file: UploadFile = File(...),
     personality: str = Form(...),
     reference_lyrics: str = Form(None),
-    reference_audio_path: str = Form(None)
+    reference_audio_path: str = Form(None),
+    offset: float = Form(0.0)
 ):
     if not host_agent:
         raise HTTPException(status_code=503, detail="Host not initialized")
@@ -285,7 +366,7 @@ async def submit_performance(
     
     try:
         # 2. Call Singing Evaluator
-        eval_args = {"audio_path": tmp_path}
+        eval_args = {"audio_path": tmp_path, "offset": offset}
         if reference_lyrics:
             eval_args["reference_lyrics_json"] = reference_lyrics
         if reference_audio_path:
@@ -321,12 +402,40 @@ async def submit_performance(
     except Exception as e:
         logger.error(f"Submission failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        # Cleanup
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
+
+@app.get("/api/leaderboard")
+async def get_leaderboard():
+    return load_leaderboard()
+
+@app.post("/api/save_score")
+async def save_score(request: ScoreRequest):
+    if not host_agent:
+        raise HTTPException(status_code=503, detail="Host not initialized")
+    
+    data = load_leaderboard()
+    
+    # Create entry with timestamp
+    from datetime import datetime
+    entry = {
+        "user_name": request.user_name,
+        "score": request.score,
+        "song": request.song,
+        "timestamp": datetime.now().isoformat()
+    }
+    
+    if request.mode == "competition":
+        data["competition"].append(entry)
+        # Sort desc
+        data["competition"] = sorted(data["competition"], key=lambda k: k['score'], reverse=True)[:50]
+    else:
+        data["casual"].append(entry)
+        data["casual"] = sorted(data["casual"], key=lambda k: k['score'], reverse=True)[:50]
+        
+    save_leaderboard(data)
+    return {"status": "saved"}
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-

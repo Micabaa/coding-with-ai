@@ -78,61 +78,52 @@ def calculate_timing_score(y, sr, reference_lyrics):
         return 0.0
 
     # 1. Detect Voice Activity (VAD)
-    # Lower top_db to catch quieter singing
-    intervals = librosa.effects.split(y, top_db=15)
+    intervals = librosa.effects.split(y, top_db=20)
     singing_intervals = librosa.samples_to_time(intervals, sr=sr)
     
     # 2. Calculate Overlap
     total_overlap_duration = 0.0
     total_lyric_duration = 0.0
     
-    # Sort lyrics by timestamp just in case
-    # Handle 'timestamp' vs 'start_time' mismatch
     sorted_lyrics = sorted(reference_lyrics, key=lambda x: x.get('timestamp', x.get('start_time', 0)))
     
     for i, lyric in enumerate(sorted_lyrics):
-        # Support both 'timestamp' (from lyrics_server) and 'start_time'
         start = float(lyric.get('timestamp', lyric.get('start_time', 0)))
         
-        # Infer end time from next line or default duration
+        # Infer end time
         if i < len(sorted_lyrics) - 1:
             next_start = float(sorted_lyrics[i+1].get('timestamp', sorted_lyrics[i+1].get('start_time', 0)))
             time_gap = next_start - start
         else:
-            time_gap = 5.0 # Default buffer
+            time_gap = 5.0
             
-        # Estimate expected singing duration based on word count
-        # Typical singing speed: 0.4s - 0.6s per word.
         words = lyric.get('text', '').split()
         num_words = len(words) if words else 1
-        estimated_duration = num_words * 0.6 # Generous 0.6s per word
-        
-        # The 'target' duration is the lesser of the Time Gap (if lines overlap fast) or Estimated Duration
-        # This effectively ignores the empty space (silence) at the end of a line.
+        estimated_duration = num_words * 0.6 
         target_duration = min(time_gap, estimated_duration)
-        
-        # Don't let target be zero
         target_duration = max(0.5, target_duration)
             
         total_lyric_duration += target_duration
         
-        # Check overlap within the FULL time gap (we allow user to sing anywhere in the gap)
-        # But we only expect them to fill 'target_duration' amount of it.
-        # Define the window to check
-        window_end = start + time_gap
+        # Window: allow slightly early start (-1.5s)
+        window_start = start - 1.5 
+        window_end = start + max(time_gap, target_duration) + 1.0 # Buffer
         
+        overlap_found = 0.0
         for sing_start, sing_end in singing_intervals:
-            overlap_start = max(start, sing_start)
-            overlap_end = min(window_end, sing_end)
+             # Check overlap
+            o_start = max(window_start, sing_start)
+            o_end = min(window_end, sing_end)
             
-            if overlap_end > overlap_start:
-                total_overlap_duration += (overlap_end - overlap_start)
+            if o_end > o_start:
+                overlap_found += (o_end - o_start)
+                
+        # Cap overlap
+        total_overlap_duration += min(overlap_found, target_duration * 1.5)
     
     if total_lyric_duration > 0:
-        # Cap score at 1.0 (if they sing longer than expected, that's fine/enthusiasm)
         score = min(1.0, total_overlap_duration / total_lyric_duration)
-        # Boost it slightly to be more encouraging
-        score = min(1.0, score * 1.2)
+        if score > 0.1: score = min(1.0, score + 0.1)
     else:
         score = 0.0
         
@@ -317,7 +308,7 @@ def analyze_pitch_detail(y_user, sr_user, reference_audio_path):
         logger.error(f"Detailed pitch analysis failed: {e}")
         return {"high": 0, "low": 0, "perfect": 0}
 
-def analyze_audio(audio_path, reference_lyrics=None, reference_audio_path=None):
+def analyze_audio(audio_path, reference_lyrics=None, reference_audio_path=None, offset=0.0):
     """
     Analyzes an audio file to extract pitch, rhythm, and other metrics.
     """
@@ -337,21 +328,26 @@ def analyze_audio(audio_path, reference_lyrics=None, reference_audio_path=None):
         # Filter lyrics to only those within the audio duration (plus buffer)
         # This prevents marking the rest of the song as "missing" if the user stops early.
         audio_duration = librosa.get_duration(y=y, sr=sr)
-        logger.info(f"Audio Duration: {audio_duration:.2f}s")
+        logger.info(f"Audio Duration: {audio_duration:.2f}s, Offset: {offset}s")
         
         relevant_lyrics = []
         if reference_lyrics:
             logger.info(f"Total Reference Lyrics: {len(reference_lyrics)}")
             if len(reference_lyrics) > 0:
                 first_ts = reference_lyrics[0].get('timestamp', reference_lyrics[0].get('start_time', 'N/A'))
-                logger.info(f"First Lyric Timestamp: {first_ts}")
+                logger.info(f"First Lyric Timestamp (Original): {first_ts}")
                 
             for line in reference_lyrics:
-                start = float(line.get('timestamp', line.get('start_time', 0)))
-                # If the line *starts* before the audio ends, it's relevant.
-                # Adding 5s buffer for trailing vocals.
-                if start < audio_duration + 5.0: 
-                    relevant_lyrics.append(line)
+                orig_start = float(line.get('timestamp', line.get('start_time', 0)))
+                # Shift timestamp by offset to match recording time
+                adjusted_start = orig_start - offset
+                
+                # If the line starts within the audio range (with small buffers)
+                if -2.0 < adjusted_start < audio_duration + 5.0: 
+                    # Create copy with adjusted timestamp
+                    new_line = line.copy()
+                    new_line['timestamp'] = adjusted_start
+                    relevant_lyrics.append(new_line)
         
         logger.info(f"Relevant Lyrics Count: {len(relevant_lyrics)}")
         if not relevant_lyrics and reference_lyrics:
