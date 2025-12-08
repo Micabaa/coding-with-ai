@@ -16,7 +16,7 @@ const NavBar = () => {
     return (
         <nav className="navbar">
             <div className="navbar-logo text-glow-magenta">
-                KaraOKAI
+                <span style={{ color: 'var(--color-gold)' }}>Kara</span>OKAI
             </div>
             <div className="navbar-links">
                 <NavLink
