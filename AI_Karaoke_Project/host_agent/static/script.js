@@ -10,6 +10,7 @@ const scoreDiv = document.getElementById('score-display');
 
 // Global stream to hold permission
 let audioStream = null;
+let currentSongPath = null;
 
 document.getElementById('play-btn').addEventListener('click', async () => {
     const query = document.getElementById('song-query').value;
@@ -302,6 +303,11 @@ async function submitPerformance(audioBlob) {
         formData.append("reference_lyrics", JSON.stringify(adjustedLyrics));
     }
 
+    // Send reference audio path if available
+    if (currentSongPath) {
+        formData.append("reference_audio_path", currentSongPath);
+    }
+
     try {
         const response = await fetch('/api/submit_performance', {
             method: 'POST',
@@ -370,4 +376,169 @@ function displayResults(data) {
 
     // Scroll to feedback
     judgeSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+// === CHAT LOGIC ===
+const chatInput = document.getElementById('chat-input');
+const sendChatBtn = document.getElementById('send-chat-btn');
+const chatHistory = document.getElementById('chat-history');
+
+function appendMessage(sender, text) {
+    const div = document.createElement('div');
+    div.className = `message ${sender.toLowerCase()}`;
+    div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    div.style.marginBottom = "5px";
+    chatHistory.appendChild(div);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+async function sendChat() {
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    appendMessage("You", message);
+    chatInput.value = "";
+
+    try {
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message })
+        });
+
+        if (!response.ok) throw new Error("Chat failed");
+
+        const data = await response.json();
+        appendMessage("Host", data.response);
+
+        if (data.action && data.action.type === 'play_audio') {
+            handlePlayAction(data.action.payload);
+        }
+
+    } catch (error) {
+        console.error(error);
+        appendMessage("System", "Error: " + error.message);
+    }
+}
+
+sendChatBtn.addEventListener('click', sendChat);
+chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendChat();
+});
+
+async function handlePlayAction(data) {
+    console.log("Handling Play Action:", data);
+
+    // 1. Get Mic Permission if needed
+    if (!audioStream) {
+        try {
+            audioStream = await navigator.mediaDevices.getUserMedia({
+                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+            });
+        } catch (err) {
+            alert("Microphone access is required! Please allow it.");
+            return;
+        }
+    }
+
+    // 2. Reset UI
+    statusDiv.textContent = `Playing: ${data.track} (Recording Started 🔴)`;
+    lyricsDiv.innerHTML = '<p class="placeholder">Loading lyrics...</p>';
+
+    videoPlayer.pause();
+    videoPlayer.style.display = 'none';
+    videoPlayer.src = "";
+    document.querySelector('.sync-controls').style.display = 'none';
+
+    // Clear previous results
+    document.getElementById('judge-section').style.display = 'none';
+    document.getElementById('judge-feedback').textContent = "";
+    document.getElementById('score-display').textContent = "";
+
+    // 3. Setup Video
+    if (data.url) {
+        videoPlayer.src = data.url;
+        videoPlayer.style.display = 'block';
+        document.querySelector('.sync-controls').style.display = 'flex';
+
+        // Show Stop Button
+        const stopBtn = document.getElementById('stop-evaluate-btn');
+        if (stopBtn) stopBtn.style.display = 'inline-block';
+
+        videoPlayer.play().catch(e => console.log("Auto-play prevented:", e));
+        updateOffsetDisplay(0.0);
+    }
+
+    // 4. Fetch Lyrics (The Host might have done this, but for now we fetch again or need it in payload)
+    // The play_song tool in agentic_host returns {url, track, file_path}. It does NOT return lyrics.
+    // The Host should ideally call lyrics tool too and pass it.
+    // BUT, for now, let's just fetch lyrics here using the track name, OR rely on the Host to have called it?
+    // The Agentic Host logic in process_user_input_with_actions only captures 'play_song' action.
+    // It doesn't capture 'search_lyrics'.
+    // So we need to fetch lyrics here.
+
+    // Store file path for evaluation
+    if (data.file_path) {
+        currentSongPath = data.file_path;
+    }
+
+    fetchLyrics(data.track);
+}
+
+// Wire up the new Stop & Evaluate button
+document.getElementById('stop-evaluate-btn')?.addEventListener('click', async () => {
+    // Hide button
+    document.getElementById('stop-evaluate-btn').style.display = 'none';
+
+    // Stop Video
+    videoPlayer.pause();
+
+    // Stop Recording & Submit
+    if (isRecording) {
+        stopRecordingAndJudge();
+    } else {
+        statusDiv.textContent = "Stopped (No recording was active).";
+    }
+
+    // Also call API stop
+    try {
+        await fetch('/api/stop_song', { method: 'POST' });
+    } catch (error) {
+        console.error(error);
+    }
+});
+
+async function fetchLyrics(query) {
+    try {
+        // We can use the lyrics agent directly via the Host proxy? 
+        // Or just use the old endpoint if it still exists?
+        // The old endpoint was /api/play_song which did both.
+        // We probably need a new endpoint /api/lyrics or similar.
+        // OR, we can just ask the Agentic Host "Give me lyrics for X"?
+        // No, that's chat.
+
+        // Let's assume we can hit the lyrics agent directly or via a proxy.
+        // Since we are moving to MCP, the frontend shouldn't hit agents directly.
+        // But we haven't built a proxy yet.
+        // However, the lyrics_server is running on port 8002.
+        // We can try to hit localhost:8002/search_lyrics if CORS allows.
+        // OR, we can add a /api/lyrics endpoint to agentic_host.py.
+
+        // Let's add /api/lyrics to agentic_host.py in the next step.
+        // For now, I'll write the fetch call assuming /api/lyrics exists.
+
+        const response = await fetch(`/api/lyrics?query=${encodeURIComponent(query)}`);
+        const data = await response.json();
+
+        if (data.lyrics) {
+            currentLyrics = data.lyrics;
+            renderLyrics(currentLyrics);
+        } else {
+            lyricsDiv.innerHTML = '<p class="placeholder">No lyrics found.</p>';
+        }
+
+    } catch (e) {
+        console.error("Lyrics fetch failed:", e);
+        lyricsDiv.innerHTML = '<p class="placeholder">Lyrics failed to load.</p>';
+    }
 }
