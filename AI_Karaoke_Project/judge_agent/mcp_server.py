@@ -97,5 +97,62 @@ def evaluate_performance(evaluation_data_json: str, personality: str = "strict_j
         logger.error(f"Unexpected error: {e}")
         return json.dumps({"error": str(e)})
 
+@mcp.tool()
+def create_persona(name: str, description: str) -> str:
+    """
+    Creates a new judge personality by generating a system prompt.
+    Requirement B4: Meta-programming (AI generating its own config).
+    
+    Args:
+        name: The name of the personality (e.g., "gangster", "yoda").
+        description: Description of how they should talk (e.g., "Talks like a 1920s mobster").
+        
+    Returns:
+        Status message.
+    """
+    if not client:
+        return "Error: OpenAI API key missing."
+        
+    try:
+        # 1. Ask LLM to generate the prompt
+        meta_prompt = f"""
+        You are an expert Prompt Engineer.
+        Create a System Prompt for an AI Karaoke Judge who has the following personality:
+        "{description}"
+        
+        The system prompt must include the placeholder [INSERT THE EVALUATION DATA JSON HERE] where the scores will be inserted.
+        The prompt should instruct the AI to be funny, specific, and stay in character.
+        Return ONLY the prompt text, nothing else.
+        """
+        
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=[{"role": "user", "content": meta_prompt}],
+            temperature=0.7
+        )
+        
+        generated_prompt = response.choices[0].message.content.strip()
+        
+        # 2. Save to file
+        filename = f"{name}_detail.txt"
+        file_path = PROMPTS_DIR / filename
+        
+        if not PROMPTS_DIR.exists():
+            PROMPTS_DIR.mkdir(parents=True, exist_ok=True)
+            
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(generated_prompt)
+            
+        logger.info(f"Created new persona: {name}")
+        return json.dumps({
+            "status": "success", 
+            "message": f"Created new judge personality: '{name}'. You can now use it!",
+            "file": str(file_path)
+        })
+        
+    except Exception as e:
+        logger.error(f"Failed to create persona: {e}")
+        return json.dumps({"error": str(e)})
+
 if __name__ == "__main__":
     mcp.run()

@@ -86,7 +86,7 @@ class KaraokeHost:
             return "Error: OpenAI API key not configured.", None
 
         messages = [
-        {"role": "system", "content": "You are the 'KaraOKAI Host', a high-energy, helpful, and music-savvy AI. Your goal is to get people singing!\n\nRules:\n1. If a user asks to sing a specific song, IMMEDIATEY use the 'play_song' tool. Do not ask for confirmation.\n2. If a user mentions an artist (e.g. 'I want to sing PVRIS'), you MUST suggest 3 of their most popular karaoke songs. ask which one they want.\n3. If a user is vague (e.g. 'idk help me'), proactively suggest 3 trending or classic karaoke bangers (e.g. Queen, Taylor Swift, The Killers). Ask what genre they like.\n4. Always be encouraging and use emojis! 🎤✨\n5. Never say you 'cannot' play a song unless the tool fails. Assume you can find it."},
+        {"role": "system", "content": "You are the AI Karaoke Host. You help users pick songs, play them, and get evaluated. Use the available tools to fulfill the user's request. Always be enthusiastic! \n\nRULES:\n1. When a user asks to sing a song, you MUST use the 'play_song' tool immediately.\n2. If a user asks to create a new judge personality (e.g. 'create a gangster judge'), use the 'create_persona' tool. Ask for a description if not provided.\n3. Do not just say you will do it, actually call the tool."},
         {"role": "user", "content": user_input}
     ]
 
@@ -197,7 +197,8 @@ class SecurityPolicy:
             "stop_song",
             "search_lyrics",
             "evaluate_singing",
-            "evaluate_performance"
+            "evaluate_performance",
+            "create_persona"
         }
         
     def is_allowed(self, tool_name: str, args: dict) -> bool:
@@ -445,8 +446,45 @@ async def submit_performance(
     except Exception as e:
         logger.error(f"Submission failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        # Cleanup
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
+
+@app.get("/api/personalities")
+async def list_personalities():
+    """Lists all available judge personalities."""
+    prompts_dir = BASE_DIR.parent / "judge_agent" / "personality_prompts"
+    personalities = ["strict_judge", "kind_grandma"] # Defaults
+    
+    if prompts_dir.exists():
+        for file in prompts_dir.glob("*_detail.txt"):
+            name = file.name.replace("_detail.txt", "")
+            if name not in personalities:
+                personalities.append(name)
+                
+    return {"personalities": sorted(personalities)}
+
+class CreatePersonaRequest(BaseModel):
+    name: str
+    description: str
+
+@app.post("/api/create_persona")
+async def api_create_persona(request: CreatePersonaRequest):
+    """Creates a new personality via the Judge Agent."""
+    if not host_agent:
+        raise HTTPException(status_code=503, detail="Host not initialized")
+        
+    # Call the tool directly
+    result_json = await host_agent.call_tool("create_persona", {
+        "name": request.name, 
+        "description": request.description
+    })
+    
+    try:
+        return json.loads(result_json)
+    except:
+        return {"status": "error", "raw": result_json}
 
 @app.get("/api/leaderboard")
 async def get_leaderboard():
