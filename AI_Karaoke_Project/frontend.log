@@ -4,7 +4,25 @@
 
 1:15:58 PM [vite] (client) Re-optimizing dependencies because vite config has changed
 
-  VITE v7.2.6  ready in 373 ms
+  VITE v7.2.6  ready in 297 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
+1:24:18 PM [vite] http proxy error: /api/personalities
+Error: socket hang up
+    at Socket.socketOnEnd (node:_http_client:542:25)
+    at Socket.emit (node:events:519:35)
+    at endReadableNT (node:internal/streams/readable:1696:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+1:24:18 PM [vite] http proxy error: /api/play_song
+Error: socket hang up
+    at Socket.socketOnEnd (node:_http_client:542:25)
+    at Socket.emit (node:events:519:35)
+    at endReadableNT (node:internal/streams/readable:1696:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+1:24:18 PM [vite] http proxy error: /api/personalities
+Error: socket hang up
+    at Socket.socketOnEnd (node:_http_client:542:25)
+    at Socket.emit (node:events:519:35)
+    at endReadableNT (node:internal/streams/readable:1696:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)

@@ -55,6 +55,7 @@ GENIUS_ACCESS_TOKEN=your-genius-access-token-here
 Use the provided script to launch the entire system (Backend Agents + Frontend).
 
 ```bash
+cd AI_Karaoke_Project
 ./start_mcp.sh
 ```
 
