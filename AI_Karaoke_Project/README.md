@@ -1,88 +1,68 @@
-# Al Karaoke Project
+# AI Karaoke Project 🎤
+
+An interactive, agentic AI karaoke experience where multiple AI agents collaborate to provide backing tracks, synced lyrics, real-time singing evaluation, and personality-driven judging.
 
 ## Overview
-The Al Karaoke Project is an Agentic AI application designed to provide an interactive karaoke experience. It consists of multiple agents, each serving a distinct role in the karaoke process, including audio playback, lyrics display, singing evaluation, and performance judging.
+
+This project demonstrates an **Agentic AI Architecture** using the **Model Context Protocol (MCP)**. Instead of a monolithic application, distinct agents run as independent servers and communicate via a central Host Agent.
+
+### The Agents 🤖
+
+1.  **Host Agent (Orchestrator)**
+    *   **Role**: The central brain. It runs a FastAPI web server and manages connections to all other agents using MCP.
+    *   **Tech**: Python, FastAPI, MCP Client, OpenAI GPT-4o.
+    *   **Entry Point**: `host_agent/agentic_host.py`
+
+2.  **Audio Playback Agent**
+    *   **Role**: Manages the library of songs and handles audio playback commands.
+    *   **Tech**: MCP Server, PyDub, SoundFile.
+
+3.  **Lyrics Display Agent**
+    *   **Role**: Fetches lyrics from the Genius API and provides line-by-line synchronization.
+    *   **Tech**: MCP Server, LyricsGenius.
+
+4.  **Singing Evaluator Agent**
+    *   **Role**: The "ears" of the system. It analyzes user audio input, comparing pitch and timing against the original track.
+    *   **Tech**: MCP Server, Librosa, FastDTW.
+
+5.  **Judge Agent**
+    *   **Role**: The "critic". It takes evaluation data and generates feedback based on a specific persona (e.g., "Strict Simon" or "Kind Grandma").
+    *   **Tech**: MCP Server, OpenAI API.
 
 ## Project Structure
-The project is organized into several modules, each representing a different agent:
 
-- **audio_playback_agent**: Handles audio playback functionality.
-  - `playback_server.py`: Main server logic for playing audio tracks.
-  - `tools/`: Contains utility functions for audio playback.
-
-- **lyrics_display_agent**: Manages the display of song lyrics.
-  - `lyrics_server.py`: Main server logic for displaying lyrics.
-  - `api_connectors/`: Connects to external APIs to fetch lyrics.
-    - `lyrics_api_tool.py`: Functionality for lyrics API integration.
-
-- **singing_evaluator_agent**: Evaluates singing performances.
-  - `evaluator_server.py`: Main server logic for evaluating performances.
-  - `audio_tools/`: Tools for analyzing audio input.
-    - `audio_analysis_tool.py`: Functions for pitch detection and timing analysis.
-
-- **judge_agent**: Evaluates performances based on predefined criteria.
-  - `judge_server.py`: Main server logic for judging performances.
-  - `personality_prompts/`: Contains personality prompts for judging.
-    - `strict_judge.txt`: Prompts for a strict judging personality.
-    - `supportive_grandma.txt`: Prompts for a supportive judging personality.
-
-- **host_agent**: Acts as the client coordinator, managing interactions between agents.
-  - `host_coordinator.py`: Logic for coordinating between agents.
-
-## Installation
-To set up the project, clone the repository and install the required dependencies:
-
-```bash
-git clone <repository-url>
-cd Al_Karaoke_Project
-pip install -r requirements.txt
+```
+AI_Karaoke_Project/
+├── host_agent/           # Central orchestrator (MCP Client + Web Server)
+├── audio_playback_agent/ # Music library and playback controls
+├── lyrics_display_agent/ # Lyrics fetching and sync
+├── singing_evaluator_agent/ # Audio analysis logic
+├── judge_agent/          # Personality-driven feedback
+├── frontend/             # React/Vite web interface
+├── start_mcp.sh          # Main startup script
+└── requirements.txt      # Python dependencies
 ```
 
-## Usage
-To run the project, start each agent's server in separate terminal instances:
+## Setup & Usage 🛠️
 
-1. Start the audio playback agent:
-   ```bash
-   python audio_playback_agent/playback_server.py
-   ```
+For detailed installation, configuration, and running instructions, please refer to the [Setup Guide](SETUP.md).
 
-2. Start the lyrics display agent:
-   ```bash
-   python lyrics_display_agent/lyrics_server.py
-   ```
-
-3. Start the singing evaluator agent:
-   ```bash
-   python singing_evaluator_agent/evaluator_server.py
-   ```
-
-4. Start the judge agent:
-   ```bash
-   python judge_agent/judge_server.py
-   ```
-
-5. Finally, start the host agent:
-   ```bash
-   python host_agent/host_coordinator.py
-   ```
-
-## Verification
-To verify the interaction between the Singing Evaluator and the Judge Agent, run the verification script:
-
+Quick Start:
 ```bash
-python test_clients/verify_agents.py
+./start_mcp.sh
 ```
 
-This script generates a synthetic audio tone, sends it to the Singing Evaluator, and forwards the result to the Judge Agent.
+## How It Works
 
-### Configuration
-To enable real AI feedback from the Judge Agent, create a `.env` file in the `judge_agent` directory with your OpenAI API key:
-
-```bash
-OPENAI_API_KEY=sk-your-api-key-here
-```
-
-If the key is missing, the Judge Agent will run in **Mock Mode** and return placeholder feedback.
+1.  **User Request**: You type "I want to sing Bohemian Rhapsody" in the web UI.
+2.  **Host Planning**: The Host Agent receives the text. It uses an LLM to decide which tool to call.
+3.  **Execution**:
+    *   Host calls `Audio Agent` -> `play_song("Bohemian Rhapsody")`.
+    *   Host calls `Lyrics Agent` -> `search_lyrics("Bohemian Rhapsody")`.
+4.  **Performance**: You sing along! The frontend records your audio.
+5.  **Evaluation**: The recording is sent to the Host, which forwards it to the `Singing Evaluator`.
+6.  **Judgment**: The technical scores (pitch/timing) are passed to the `Judge Agent`, which writes a review like: *"Pitchy on the high notes, darling, but I loved the enthusiasm!"*
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for more details.
+
+MIT License
