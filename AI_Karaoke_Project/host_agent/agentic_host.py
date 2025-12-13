@@ -224,24 +224,18 @@ class SecurityPolicy:
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import JSONResponse
 
 # ... (Previous imports remain, ensure they are there)
 
 app = FastAPI(title="Agentic Karaoke Host")
 
-# Mount static files and templates (reusing existing structure)
 BASE_DIR = Path(__file__).parent
-STATIC_DIR = BASE_DIR / "static"
-TEMPLATES_DIR = BASE_DIR / "templates"
 
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-templates = Jinja2Templates(directory=TEMPLATES_DIR)
-
+# Mount static files and templates (reusing existing structure)
 # Mount songs directory for playback
-SONGS_DIR = BASE_DIR.parent / "audio_playback_agent" / "songs"
+SONGS_DIR = Path(__file__).parent.parent / "audio_playback_agent" / "songs"
 if not SONGS_DIR.exists():
     SONGS_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/songs", StaticFiles(directory=SONGS_DIR), name="songs")
@@ -294,9 +288,9 @@ async def shutdown_event():
     if host_agent:
         await host_agent.cleanup()
 
-@app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+@app.get("/")
+async def read_root():
+    return {"status": "Agentic Host Running", "mode": "API Only"}
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):

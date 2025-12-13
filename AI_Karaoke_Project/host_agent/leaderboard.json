@@ -73,6 +73,12 @@
       "timestamp": "2025-12-03T16:09:59.001923"
     },
     {
+      "user_name": "An My",
+      "score": 5020,
+      "song": "Yot Club - Fly Out West (Instrumental)",
+      "timestamp": "2025-12-14T00:20:55.267652"
+    },
+    {
       "user_name": "Olma Kuh",
       "score": 4913,
       "song": "Harry Styles - Golden (Karaoke Version)",
@@ -95,6 +101,12 @@
       "score": 4811,
       "song": "Lola Marsh She's A Rainbow Karaoke",
       "timestamp": "2025-12-04T12:39:44.276301"
+    },
+    {
+      "user_name": "olmakuh",
+      "score": 4631,
+      "song": "Vacations - Next Exit (Lyrics)",
+      "timestamp": "2025-12-14T00:15:14.081923"
     },
     {
       "user_name": "An My",
@@ -271,6 +283,18 @@
       "score": 6390,
       "song": "The American Dawn - Her | Karaoke Guitar Instrumental",
       "timestamp": "2025-12-05T14:27:09.061602"
+    },
+    {
+      "user_name": "An My",
+      "score": 4581,
+      "song": "Ralph Castelli- Pretend (Official Audio)",
+      "timestamp": "2025-12-14T00:23:21.026395"
+    },
+    {
+      "user_name": "Mia",
+      "score": 4476,
+      "song": "Ralph Castelli- Pretend (Official Audio)",
+      "timestamp": "2025-12-14T00:25:01.708942"
     }
   ]
 }
