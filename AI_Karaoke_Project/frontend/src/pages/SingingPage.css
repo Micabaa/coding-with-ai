@@ -535,6 +535,23 @@
     color: var(--color-cyan);
 }
 
+.lyrics-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    font-size: 0.9rem;
+    color: #aaa;
+    display: flex;
+    align-items: center;
+}
+
 /* Battle Mode Styles */
 
 .battle-setup-container,

@@ -80,15 +80,22 @@ class KaraokeHost:
             else:
                 logger.error(f"Could not find agent script: {path}")
 
-    async def process_user_input_with_actions(self, user_input: str):
+    async def process_user_input_with_actions(self, user_input: str, history: list = None):
         """Processes user input and returns text response + optional action."""
         if not self.client:
             return "Error: OpenAI API key not configured.", None
 
         messages = [
-        {"role": "system", "content": "You are the AI Karaoke Host. You help users pick songs, play them, and get evaluated. Use the available tools to fulfill the user's request. Always be enthusiastic! \n\nRULES:\n1. When a user asks to sing a song, you MUST use the 'play_song' tool immediately.\n2. If a user asks to create a new judge personality (e.g. 'create a gangster judge'), use the 'create_persona' tool. Ask for a description if not provided.\n3. Do not just say you will do it, actually call the tool."},
-        {"role": "user", "content": user_input}
-    ]
+            {"role": "system", "content": "You are the AI Karaoke Host. You help users pick songs, play them, and get evaluated. Use the available tools to fulfill the user's request. Always be enthusiastic! \n\nRULES:\n1. When a user asks to sing a song, you MUST use the 'play_song' tool immediately.\n2. If a user asks to create a new judge personality (e.g. 'create a gangster judge'), use the 'create_persona' tool. Ask for a description if not provided.\n3. Do not just say you will do it, actually call the tool."}
+        ]
+        
+        if history:
+            # Append history (ensure valid roles)
+            for msg in history:
+                if msg.get("role") in ["user", "assistant"]:
+                    messages.append({"role": msg["role"], "content": msg["content"]})
+
+        messages.append({"role": "user", "content": user_input})
 
         # 1. Call LLM with tools
         response = await self.client.chat.completions.create(
@@ -242,6 +249,7 @@ app.mount("/songs", StaticFiles(directory=SONGS_DIR), name="songs")
 
 class ChatRequest(BaseModel):
     message: str
+    history: Optional[list] = []
 
 class ChatResponse(BaseModel):
     response: str
@@ -298,7 +306,8 @@ async def chat(request: ChatRequest):
         raise HTTPException(status_code=503, detail="Host not initialized")
     
     user_input = request.message
-    response_text, action = await host_agent.process_user_input_with_actions(user_input)
+    # Pass history
+    response_text, action = await host_agent.process_user_input_with_actions(user_input, history=request.history)
     
     return ChatResponse(response=response_text, action=action)
 
@@ -327,7 +336,7 @@ async def chat_endpoint(request: ChatRequest):
     if not host_agent:
         raise HTTPException(status_code=503, detail="Host not initialized")
 
-    response_text, action = await host_agent.process_user_input_with_actions(request.message)
+    response_text, action = await host_agent.process_user_input_with_actions(request.message, history=request.history)
     return {
         "response": response_text,
         "action": action
