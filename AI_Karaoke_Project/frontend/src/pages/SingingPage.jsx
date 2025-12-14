@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Search, Play, Square, Mic, Volume2, Eye, EyeOff, Minus, Plus } from 'lucide-react';
 import './SingingPage.css';
@@ -7,6 +8,7 @@ import LoadingOverlay from '../components/LoadingOverlay';
 const SingingPage = ({ mode = 'casual' }) => {
     // States: 'search', 'playing', 'evaluation', 'battle_setup', 'battle_intermission', 'battle_reveal'
     const [viewState, setViewState] = useState(mode === 'competition' ? 'battle_setup' : 'search');
+    const location = useLocation();
 
     // Battle Mode Data
     const [battlePlayers, setBattlePlayers] = useState({ p1: '', p2: '' });
@@ -63,6 +65,50 @@ const SingingPage = ({ mode = 'casual' }) => {
         fetchPersonalities();
     }, []);
 
+    const fetchAndPlaySong = async (searchQuery) => {
+        try {
+            // Reset
+            setSongData(null);
+            setLyrics([]);
+            setVideoUrl('');
+
+            // Call Host Agent
+            setIsLoadingSong(true);
+            const res = await axios.post('/api/play_song', { query: searchQuery });
+            const { audio, lyrics: lyricsData } = res.data;
+
+            setSongData({
+                title: audio.track,
+                artist: "Unknown", // Backend doesn't return artist explicitly yet
+                file_path: audio.file_path,
+                is_sing_king: audio.is_sing_king
+            });
+
+            setVideoUrl(audio.url);
+            setLyrics(lyricsData.lyrics || []);
+            setViewState('playing');
+
+        } catch (err) {
+            console.error(err);
+            alert("Failed to load song. Please try again.");
+        } finally {
+            setIsLoadingSong(false);
+        }
+    };
+
+    // Auto-Play Effect
+    useEffect(() => {
+        if (location.state?.autoPlaySong) {
+            const songToPlay = location.state.autoPlaySong;
+            setQuery(songToPlay);
+            // Clear state so it doesn't loop if we go back (though react router state usually persists)
+            // Ideally we'd replace history but for now just running it is fine.
+            fetchAndPlaySong(songToPlay);
+            // Clear the state from history to prevent replay on refresh? requires navigate replace.
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]); // Depend on location.state
+
     const handleCreatePersona = async () => {
         if (!newPersonaName || !newPersonaDesc) {
             setCreatePersonaStatus("Error: Please fill in both fields.");
@@ -117,37 +163,7 @@ const SingingPage = ({ mode = 'casual' }) => {
     const handleSearch = async (e) => {
         e.preventDefault();
         if (!query.trim()) return;
-
-        // ... (rest of logic handles playback)
-
-        try {
-            // Reset
-            setSongData(null);
-            setLyrics([]);
-            setVideoUrl('');
-
-            // Call Host Agent
-            setIsLoadingSong(true);
-            const res = await axios.post('/api/play_song', { query });
-            const { audio, lyrics: lyricsData } = res.data;
-
-            setSongData({
-                title: audio.track,
-                artist: "Unknown", // Backend doesn't return artist explicitly yet
-                file_path: audio.file_path,
-                is_sing_king: audio.is_sing_king
-            });
-
-            setVideoUrl(audio.url);
-            setLyrics(lyricsData.lyrics || []);
-            setViewState('playing');
-
-        } catch (err) {
-            console.error(err);
-            alert("Failed to load song. Please try again.");
-        } finally {
-            setIsLoadingSong(false);
-        }
+        await fetchAndPlaySong(query);
     };
 
     // Video Time Update
@@ -638,6 +654,21 @@ const SingingPage = ({ mode = 'casual' }) => {
                                 <p style={{ fontStyle: 'italic', color: '#ccc' }}>"{evaluation.transcribed_text}"</p>
                             </div>
                         )}
+
+                        <div className="lyrics-legend">
+                            <div className="legend-item">
+                                <span className="diff-word diff-matched">Correct</span>
+                            </div>
+                            <div className="legend-item">
+                                <span className="diff-word diff-wrong">Mispronounced</span>
+                            </div>
+                            <div className="legend-item">
+                                <span className="diff-word diff-missing">Missed</span>
+                            </div>
+                            <div className="legend-item">
+                                <span className="diff-word diff-extra">Extra</span>
+                            </div>
+                        </div>
                     </div>
                 )}
 

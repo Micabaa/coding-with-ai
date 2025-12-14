@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Send, User, Bot, Loader } from 'lucide-react';
+import { Send, User, Bot, Loader, Music } from 'lucide-react';
 import './ChatPage.css';
 
 const ChatPage = () => {
@@ -10,6 +11,7 @@ const ChatPage = () => {
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
+    const navigate = useNavigate();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -29,18 +31,22 @@ const ChatPage = () => {
         setIsLoading(true);
 
         try {
-            const res = await axios.post('/api/chat', { message: userMsg });
+            // Prepare history (exclude system messages if any, though backend filters too)
+            const history = messages.filter(m => m.role === 'user' || m.role === 'assistant');
+            const res = await axios.post('/api/chat', {
+                message: userMsg,
+                history: history
+            });
             const { response, action } = res.data;
 
             setMessages(prev => [...prev, { role: 'assistant', content: response }]);
 
             if (action && action.type === 'play_audio') {
-                // Determine if we should redirect or just notify
-                // For now, let's notify the user they can go to the singing page
-                // Or we could auto-navigate?
-                // The user request didn't specify auto-play from chat, but implied it.
-                // Let's just append a message about the action.
-                setMessages(prev => [...prev, { role: 'system', content: `🎵 I found "${action.payload.track}". Go to the Singing page to perform it!` }]);
+                setMessages(prev => [...prev, {
+                    role: 'system',
+                    content: `🎵 I found "${action.payload.track}". Ready to sing?`,
+                    actionData: action.payload
+                }]);
             }
 
         } catch (err) {
@@ -62,7 +68,17 @@ const ChatPage = () => {
                             <div className="message-bubble">
                                 {msg.role === 'user' && <User size={16} className="msg-icon" />}
                                 {msg.role === 'assistant' && <Bot size={16} className="msg-icon" />}
-                                <div className="msg-content">{msg.content}</div>
+                                <div className="msg-content">
+                                    {msg.content}
+                                    {msg.actionData && (
+                                        <button
+                                            className="action-btn"
+                                            onClick={() => navigate('/singing', { state: { autoPlaySong: msg.actionData.track } })}
+                                        >
+                                            <Music size={16} /> Sing "{msg.actionData.track}" Now!
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))}
