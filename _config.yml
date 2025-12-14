@@ -1,0 +1,3 @@
+exclude:
+  - AI_Karaoke_Project/frontend/node_modules
+  - node_modules
