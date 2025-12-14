@@ -39,6 +39,29 @@ def download_video(query: str):
         'extract_flat': False,
     }
 
+    # Cache file for query -> video_id mapping
+    CACHE_FILE = os.path.join(SONGS_DIR, "query_cache.json")
+    query_cache = {}
+    if os.path.exists(CACHE_FILE):
+        try:
+            with open(CACHE_FILE, 'r') as f:
+                query_cache = json.load(f)
+        except:
+            pass
+
+    # Check cache first
+    cached_id = query_cache.get(query)
+    if cached_id:
+        file_path = os.path.join(SONGS_DIR, f"{cached_id}.mp4")
+        if os.path.exists(file_path):
+            logger.info(f"Cache hit for '{query}' -> {cached_id}")
+            return {
+                "url": f"/songs/{cached_id}.mp4",
+                "title": f"Cached: {query}", # We might lose original title, but speed is key
+                "track": f"Cached: {query}",
+                "file_path": os.path.abspath(file_path)
+            }
+
     try:
         # Redirect stdout/stderr to suppress any leaking output from yt-dlp
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
@@ -74,6 +97,11 @@ def download_video(query: str):
                     ydl_opts['default_search'] = 'ytsearch1:' # Reset
                     with yt_dlp.YoutubeDL(ydl_opts) as ydl_download:
                         ydl_download.download([video_info['webpage_url']])
+                
+                # Update Cache
+                query_cache[query] = video_id
+                with open(CACHE_FILE, 'w') as f:
+                    json.dump(query_cache, f)
             
             return {
                 "url": f"/songs/{video_id}.mp4",

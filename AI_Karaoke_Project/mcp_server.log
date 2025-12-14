@@ -1,21 +1,22 @@
 🎤 Starting AI Karaoke Agentic Host (MCP)...
-🧹 Cleaning up ports 8000-8004...
+🧹 Cleaning up ports 8000-8004 and 5173-5174...
    Waiting for ports to be released...
-/Users/anmyb/Programming/coding-with-ai/AI_Karaoke_Project/host_agent/agentic_host.py:215: DeprecationWarning: 
+🚀 Starting Frontend...
+/Users/anmyb/Programming/coding-with-ai/AI_Karaoke_Project/host_agent/agentic_host.py:284: DeprecationWarning: 
         on_event is deprecated, use lifespan event handlers instead.
 
         Read more about it in the
         [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
         
   @app.on_event("startup")
-/Users/anmyb/Programming/coding-with-ai/AI_Karaoke_Project/host_agent/agentic_host.py:222: DeprecationWarning: 
+/Users/anmyb/Programming/coding-with-ai/AI_Karaoke_Project/host_agent/agentic_host.py:291: DeprecationWarning: 
         on_event is deprecated, use lifespan event handlers instead.
 
         Read more about it in the
         [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
         
   @app.on_event("shutdown")
-INFO:     Started server process [57023]
+INFO:     Started server process [24133]
 INFO:     Waiting for application startup.
 INFO:mcp.server.lowlevel.server:Processing request of type ListToolsRequest
 INFO:AgenticHost:Connected to lyrics MCP Server. Found tools: ['search_lyrics']
@@ -24,8 +25,9 @@ INFO:AgenticHost:Connected to audio MCP Server. Found tools: ['play_song', 'stop
 INFO:mcp.server.lowlevel.server:Processing request of type ListToolsRequest
 INFO:AgenticHost:Connected to evaluator MCP Server. Found tools: ['evaluate_singing']
 INFO:mcp.server.lowlevel.server:Processing request of type ListToolsRequest
-INFO:AgenticHost:Connected to judge MCP Server. Found tools: ['evaluate_performance']
+INFO:AgenticHost:Connected to judge MCP Server. Found tools: ['evaluate_performance', 'create_persona']
 INFO:AgenticHost:Agentic Host started and connected.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-./start_mcp.sh: line 52: 57023 Killed: 9               python3 host_agent/agentic_host.py
+./start_mcp.sh: line 65: 24133 Killed: 9               python3 host_agent/agentic_host.py
+Frontend stopped.

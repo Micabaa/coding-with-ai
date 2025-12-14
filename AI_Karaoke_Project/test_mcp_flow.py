@@ -14,14 +14,14 @@ async def test_flow():
         
         # Test 1: Simple greeting (should not call tools)
         print("\n--- Test 1: Greeting ---")
-        response = await host.process_user_input("Hello, who are you?")
+        response, action = await host.process_user_input_with_actions("Hello, who are you?")
         print(f"Host: {response}")
         
         # Test 2: Song request (should call lyrics and audio tools)
         # Note: We won't actually play audio in this test environment, but we check if tools are called.
         # The logs will show tool calls.
         print("\n--- Test 2: Song Request ---")
-        response = await host.process_user_input("I want to sing Bohemian Rhapsody")
+        response, action = await host.process_user_input_with_actions("I want to sing Bohemian Rhapsody")
         print(f"Host: {response}")
         
     except Exception as e:

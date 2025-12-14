@@ -38,7 +38,70 @@ const SingingPage = ({ mode = 'casual' }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Judge Selection
-    const [judgePersonality, setJudgePersonality] = useState(mode === 'competition' ? 'strict_judge' : 'friendly');
+    const [judgePersonality, setJudgePersonality] = useState(mode === 'competition' ? 'strict_judge' : 'kind_grandma');
+    const [availablePersonalities, setAvailablePersonalities] = useState(['strict_judge', 'kind_grandma']);
+
+    // Create Persona State
+    const [showCreatePersona, setShowCreatePersona] = useState(false);
+    const [newPersonaName, setNewPersonaName] = useState('');
+    const [newPersonaDesc, setNewPersonaDesc] = useState('');
+    const [isCreatingPersona, setIsCreatingPersona] = useState(false);
+    const [createPersonaStatus, setCreatePersonaStatus] = useState('');
+
+    // Load Personalities
+    useEffect(() => {
+        const fetchPersonalities = async () => {
+            try {
+                const res = await axios.get('/api/personalities');
+                if (res.data.personalities) {
+                    setAvailablePersonalities(res.data.personalities);
+                }
+            } catch (err) {
+                console.error("Failed to load personalities", err);
+            }
+        };
+        fetchPersonalities();
+    }, []);
+
+    const handleCreatePersona = async () => {
+        if (!newPersonaName || !newPersonaDesc) {
+            setCreatePersonaStatus("Error: Please fill in both fields.");
+            return;
+        }
+
+        const name = newPersonaName.trim().toLowerCase().replace(/\s+/g, '_');
+        setIsCreatingPersona(true);
+        setCreatePersonaStatus("Generating prompt... (this takes ~5s)");
+
+        try {
+            const res = await axios.post('/api/create_persona', {
+                name: name,
+                description: newPersonaDesc
+            });
+
+            if (res.data.status === 'success') {
+                setCreatePersonaStatus("Success! Created " + name);
+                // Refresh list
+                const listRes = await axios.get('/api/personalities');
+                if (listRes.data.personalities) {
+                    setAvailablePersonalities(listRes.data.personalities);
+                }
+                setJudgePersonality(name);
+                setNewPersonaName('');
+                setNewPersonaDesc('');
+                setTimeout(() => {
+                    setShowCreatePersona(false);
+                    setCreatePersonaStatus('');
+                }, 2000);
+            } else {
+                setCreatePersonaStatus("Error: " + (res.data.error || "Unknown"));
+            }
+        } catch (err) {
+            setCreatePersonaStatus("Network Error");
+        } finally {
+            setIsCreatingPersona(false);
+        }
+    };
 
     // Handle Start Battle
     const handleStartBattle = (e) => {
@@ -420,35 +483,63 @@ const SingingPage = ({ mode = 'casual' }) => {
                             🔒 <strong>COMPETITION MODE</strong>: Strict Judge Enforced
                         </div>
                     ) : (
-                        <div className="judge-toggle">
-                            <button
-                                className={`judge-btn ${judgePersonality === 'friendly' ? 'active' : ''}`}
-                                onClick={() => setJudgePersonality('friendly')}
-                                title="Supportive Grandma"
-                            >
-                                👵 Friendly
-                            </button>
-                            <button
-                                className={`judge-btn ${judgePersonality === 'strict_judge' ? 'active' : ''}`}
-                                onClick={() => setJudgePersonality('strict_judge')}
-                                title="Strict Judge"
-                            >
-                                👨‍⚖️ Strict
-                            </button>
-                            <button
-                                className={`judge-btn ${judgePersonality === 'overly_enthusiastic' ? 'active' : ''}`}
-                                onClick={() => setJudgePersonality('overly_enthusiastic')}
-                                title="Hype Man"
-                            >
-                                🤩 Hype
-                            </button>
-                            <button
-                                className={`judge-btn ${judgePersonality === 'lazy_critic' ? 'active' : ''}`}
-                                onClick={() => setJudgePersonality('lazy_critic')}
-                                title="Lazy Critic"
-                            >
-                                😴 Lazy
-                            </button>
+                        <div className="judge-selection-wrapper">
+                            <div className="judge-toggle">
+                                {availablePersonalities.map(p => (
+                                    <button
+                                        key={p}
+                                        className={`judge-btn ${judgePersonality === p ? 'active' : ''}`}
+                                        onClick={() => setJudgePersonality(p)}
+                                        title={p.replace(/_/g, ' ')}
+                                    >
+                                        {p === 'strict_judge' ? '👨‍⚖️ Strict' :
+                                            p === 'kind_grandma' ? '👵 Grandma' :
+                                                p.charAt(0).toUpperCase() + p.slice(1).replace(/_/g, ' ')}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Create New Persona UI */}
+                            <div className="create-persona-section" style={{ marginTop: '15px', borderTop: '1px solid #444', paddingTop: '10px' }}>
+                                <button
+                                    className="text-link"
+                                    onClick={() => setShowCreatePersona(!showCreatePersona)}
+                                    style={{ background: 'none', border: 'none', color: '#a29bfe', cursor: 'pointer', textDecoration: 'underline' }}
+                                >
+                                    {showCreatePersona ? '- Cancel' : '+ Create New Personality'}
+                                </button>
+
+                                {showCreatePersona && (
+                                    <div className="create-persona-form box-glow" style={{ marginTop: '10px', padding: '10px', background: '#2d3436' }}>
+                                        <input
+                                            type="text"
+                                            placeholder="Name (e.g. gangster)"
+                                            value={newPersonaName}
+                                            onChange={e => setNewPersonaName(e.target.value)}
+                                            style={{ width: '100%', marginBottom: '5px', padding: '5px', borderRadius: '4px', border: 'none' }}
+                                        />
+                                        <textarea
+                                            placeholder="Description (e.g. Talks like a 1920s mobster...)"
+                                            value={newPersonaDesc}
+                                            onChange={e => setNewPersonaDesc(e.target.value)}
+                                            style={{ width: '100%', marginBottom: '5px', padding: '5px', borderRadius: '4px', border: 'none' }}
+                                            rows={2}
+                                        />
+                                        <button
+                                            onClick={handleCreatePersona}
+                                            disabled={isCreatingPersona}
+                                            style={{ width: '100%', padding: '5px', background: '#6c5ce7', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                                        >
+                                            {isCreatingPersona ? 'Generating...' : 'Generate AI Persona'}
+                                        </button>
+                                        {createPersonaStatus && (
+                                            <p style={{ fontSize: '0.8em', color: createPersonaStatus.includes('Error') ? '#ff7675' : '#55efc4', marginTop: '5px' }}>
+                                                {createPersonaStatus}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>

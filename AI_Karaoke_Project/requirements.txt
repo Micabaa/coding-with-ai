@@ -1,7 +1,6 @@
 fastapi
 uvicorn[standard]
 pydantic
-jinja2
 openai>=1.13.3
 python-dotenv>=1.0.1
 requests
@@ -11,7 +10,6 @@ librosa>=0.10.0
 yt-dlp
 lyricsgenius
 syncedlyrics
-# scikit-learn==0.24.2
 mcp>=0.3.0
 scipy
 fastdtw

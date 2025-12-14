@@ -17,9 +17,9 @@ pip3 install -r requirements.txt --break-system-packages > /dev/null 2>&1
 
 # Function to kill processes on specific ports
 cleanup_ports() {
-    echo "🧹 Cleaning up ports 8000-8004 and 5173-5174..."
+    echo "🧹 Cleaning up ports 8000 and 5173-5174..."
     # Combine backend and frontend ports logic
-    PORTS=(8000 8001 8002 8003 8004 5173 5174)
+    PORTS=(8000 5173 5174)
     for PORT in "${PORTS[@]}"; do
         # Find all PIDs using the port
         PIDS=$(lsof -ti:$PORT)
@@ -56,6 +56,13 @@ cd frontend
 npm run dev > ../frontend.log 2>&1 &
 FRONTEND_PID=$!
 cd ..
+
+# 4. Display Access Information
+echo ""
+echo "🎉  AI Karaoke System Started!"
+echo "👉  Frontend running at: http://localhost:5173"
+echo "    (API Host running at: http://localhost:8000)"
+echo ""
 
 # Trap to kill frontend on exit
 trap "kill $FRONTEND_PID 2>/dev/null; echo 'Frontend stopped.'" EXIT
