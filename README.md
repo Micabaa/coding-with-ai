@@ -45,7 +45,6 @@ AI_Karaoke_Project/
 
 ## Setup & Usage 🛠️
 
-For detailed installation, configuration, and running instructions, please refer to the [Setup Guide](SETUP.md).
 
 Quick Start:
 ```bash
@@ -62,7 +61,3 @@ Quick Start:
 4.  **Performance**: You sing along! The frontend records your audio.
 5.  **Evaluation**: The recording is sent to the Host, which forwards it to the `Singing Evaluator`.
 6.  **Judgment**: The technical scores (pitch/timing) are passed to the `Judge Agent`, which writes a review like: *"Pitchy on the high notes, darling, but I loved the enthusiasm!"*
-
-## License
-
-MIT License
