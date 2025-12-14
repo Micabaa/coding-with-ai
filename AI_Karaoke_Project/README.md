@@ -47,38 +47,43 @@ This project demonstrates a robust **Agentic Architecture** where specialized AI
 ## 🚀 Getting Started
 
 ### Prerequisites
-- **Python 3.10+**
-- **Node.js & npm**
-- **FFmpeg** (Required for audio processing)
-- **OpenAI API Key** (for Judge/Host intelligence)
-- **Genius API Token** (for Lyrics)
+
+*   **Python 3.10+**
+*   **Node.js & npm** (Required for the frontend)
+*   **FFmpeg** (Required for audio processing)
+    *   **Mac**: `brew install ffmpeg`
+    *   **Windows**: Download from [ffmpeg.org](https://ffmpeg.org/download.html) and add to PATH.
+    *   **Linux**: `sudo apt install ffmpeg`
+*   **OpenAI API Key** (for Judge/Host intelligence)
+*   **Genius API Token** (for Lyrics)
 
 ### Quick Start
 
-1. **Clone the Repo**
-   ```bash
-   git clone <repository-url>
-   cd AI_Karaoke_Project
-   ```
+1.  **Clone the Repository**
+    ```bash
+    git clone <repository-url>
+    cd AI_Karaoke_Project
+    ```
 
-2. **Configure Environment**
-   Create a `.env` file in the root:
-   ```bash
-   OPENAI_API_KEY=sk-...
-   GENIUS_ACCESS_TOKEN=...
-   ```
+2.  **Configure Environment**
+    Create a `.env` file in the root directory:
+    ```bash
+    # OpenAI API Key (Required for Host and Judge Agents)
+    OPENAI_API_KEY=sk-your-openai-key-here
+    
+    # Genius API Token (Required for Lyrics Display Agent)
+    GENIUS_ACCESS_TOKEN=your-genius-access-token-here
+    ```
 
-3. **Run the Initialization Script**
-   This script sets up virtual environments, installs dependencies, and launches the system.
-   ```bash
-   ./start_mcp.sh
-   ```
+3.  **Run the Initialization Script**
+    This script sets up virtual environments, installs dependencies, and launches the system.
+    ```bash
+    ./start_mcp.sh
+    ```
 
-4. **Sing!**
-   - Frontend: [http://localhost:5173](http://localhost:5173)
-   - API Host: [http://localhost:8000](http://localhost:8000)
-
-For detailed manual setup instructions, see [SETUP.md](./SETUP.md).
+4.  **Sing!**
+    *   **Frontend**: [http://localhost:5173](http://localhost:5173) (User Interface)
+    *   **API Host**: [http://localhost:8000](http://localhost:8000) (Backend API)
 
 ---
 
